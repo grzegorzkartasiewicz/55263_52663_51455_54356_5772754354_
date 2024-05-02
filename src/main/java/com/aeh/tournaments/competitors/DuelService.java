@@ -39,6 +39,9 @@ public class DuelService {
     }
 
 
+    public List<Duel> findByCategory(String category) {
+        return duelRepository.findByCategory(category);
+    }
 }
 
 
