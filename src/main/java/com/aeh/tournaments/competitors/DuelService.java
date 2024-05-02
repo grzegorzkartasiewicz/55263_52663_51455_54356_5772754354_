@@ -38,8 +38,7 @@ public class DuelService {
         duelRepository.deleteById(duelId);
     }
 
-    public List<Duel> findByCategory(String category) {
-    }
+
 }
 
 
