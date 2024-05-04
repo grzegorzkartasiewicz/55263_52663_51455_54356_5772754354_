@@ -1,8 +1,6 @@
 package com.aeh.tournaments.tournament;
 
-import com.aeh.tournaments.competitors.Competitor;
 import com.aeh.tournaments.competitors.CompetitorDTO;
-import com.aeh.tournaments.duel.Duel;
 import com.aeh.tournaments.duel.DuelDTO;
 import com.aeh.tournaments.duel.DuelService;
 import org.springframework.stereotype.Service;

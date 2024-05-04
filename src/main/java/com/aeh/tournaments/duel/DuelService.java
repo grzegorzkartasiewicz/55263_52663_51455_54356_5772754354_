@@ -1,7 +1,6 @@
 package com.aeh.tournaments.duel;
 
 
-import com.aeh.tournaments.competitors.Competitor;
 import com.aeh.tournaments.competitors.CompetitorDTO;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +45,7 @@ public class DuelService {
         List<CompetitorDTO> competitorsList = new ArrayList<>(competitors);
         Set<DuelDTO> firstRound = new HashSet<>();
         int position = 0;
-        for( int i = 0; i < competitors.size()/2; i=+2, position++) {
+        for( int i = 0; i < competitors.size()/2; i+= 2, position++) {
             DuelDTO duel = new DuelDTO();
             duel.setParticipant1(String.valueOf(competitorsList.get(i).getId()));
             duel.setParticipant2(String.valueOf((i + 1) == competitorsList.size() ? null : competitorsList.get(i + 1).getId()));
