@@ -1,45 +1,43 @@
-package com.aeh.tournaments.competitors;
+package com.aeh.tournaments.duel;
 
 
-import com.aeh.tournaments.competitors.model.Duel;
-import com.aeh.tournaments.competitors.repository.DuelRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class DuelService {
+class DuelService {
 
     private final DuelRepository duelRepository;
 
-    public DuelService(DuelRepository duelRepository) {
+    DuelService(DuelRepository duelRepository) {
         this.duelRepository = duelRepository;
     }
 
-    public List<Duel> getAllDuels() {
+    List<Duel> getAllDuels() {
         return duelRepository.findAll();
     }
 
-    public Duel getDuelById(Long duelId) {
+    Duel getDuelById(Long duelId) {
         Optional<Duel> optionalDuel = duelRepository.findById(duelId);
         return optionalDuel.orElse(null);
     }
 
-    public Duel save(Duel duel) {
+    Duel save(Duel duel) {
         return duelRepository.save(duel);
     }
 
-    public Optional<Duel> findById(Long duelId) {
+    Optional<Duel> findById(Long duelId) {
         return duelRepository.findById(duelId);
     }
 
-    public void deleteById(Long duelId) {
+    void deleteById(Long duelId) {
         duelRepository.deleteById(duelId);
     }
 
 
-    public List<Duel> findByCategory(String category) {
+    List<Duel> findByCategory(String category) {
         return duelRepository.findByCategory(category);
     }
 }
