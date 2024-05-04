@@ -1,6 +1,5 @@
 package com.aeh.tournaments.competitors;
 
-import com.aeh.tournaments.competitors.model.Competitor;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

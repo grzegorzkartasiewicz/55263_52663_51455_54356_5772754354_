@@ -1,4 +1,4 @@
-package com.aeh.tournaments.competitors.model;
+package com.aeh.tournaments.competitors;
 
 
 import jakarta.persistence.Entity;
@@ -18,7 +18,7 @@ import lombok.Setter;
 public class Competitor {
     @Id
     @GeneratedValue()
-    private int id;
+    private long id;
     @NotNull
     private String name;
     @NotNull

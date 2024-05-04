@@ -1,4 +1,4 @@
-package com.aeh.tournaments.competitors.model;
+package com.aeh.tournaments.duel;
 
 
 import jakarta.persistence.Entity;
@@ -15,8 +15,7 @@ public class Duel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
-    private Long duelId;
+    private long duelId;
     private String participant1;
     private String participant2;
     private String winner;
