@@ -24,17 +24,17 @@ class CompetitorController {
      * @return created competitor
      */
     @PostMapping
-    ResponseEntity<Competitor> createCompetitor(@RequestBody @Valid Competitor competitor) {
+    ResponseEntity<CompetitorDTO> createCompetitor(@RequestBody @Valid CompetitorDTO competitor) {
         return ResponseEntity.ok(competitorService.save(competitor));
     }
 
     @GetMapping
-    ResponseEntity<List<Competitor>> getAllCompetitors() {
+    ResponseEntity<List<CompetitorDTO>> getAllCompetitors() {
         return ResponseEntity.ok(competitorService.getAllCompetitors());
     }
 
     @PutMapping(value = "/{competitorId}")
-    ResponseEntity<Competitor> updateCompetitor(@PathVariable Integer competitorId, @RequestBody @Valid Competitor competitor) {
+    ResponseEntity<CompetitorDTO> updateCompetitor(@PathVariable Integer competitorId, @RequestBody @Valid CompetitorDTO competitor) {
         competitor.setId(competitorId);
         return ResponseEntity.ok(competitorService.update(competitor));
     }

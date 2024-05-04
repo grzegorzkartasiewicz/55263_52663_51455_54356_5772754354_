@@ -13,16 +13,16 @@ class CompetitorService {
         this.competitorRepository = competitorRepository;
     }
 
-    Competitor save(Competitor competitor) {
-        return competitorRepository.save(competitor);
+    CompetitorDTO save(CompetitorDTO competitor) {
+        return CompetitorDTO.toDto(competitorRepository.save(competitor.toEntity()));
     }
 
-    List<Competitor> getAllCompetitors() {
-        return competitorRepository.findAll();
+    List<CompetitorDTO> getAllCompetitors() {
+        return competitorRepository.findAll().stream().map(CompetitorDTO::toDto).toList();
     }
 
-    Competitor update(Competitor competitor) {
-        return competitorRepository.save(competitor);
+    CompetitorDTO update(CompetitorDTO competitor) {
+        return CompetitorDTO.toDto(competitorRepository.save(competitor.toEntity()));
     }
 
     void delete(long competitorId) {

@@ -1,13 +1,14 @@
 package com.aeh.tournaments.duel;
 
 
+import com.aeh.tournaments.competitors.Competitor;
+import com.aeh.tournaments.competitors.CompetitorDTO;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
-class DuelService {
+public class DuelService {
 
     private final DuelRepository duelRepository;
 
@@ -19,17 +20,17 @@ class DuelService {
         return duelRepository.findAll();
     }
 
-    Duel getDuelById(Long duelId) {
+    DuelDTO getDuelById(Long duelId) {
         Optional<Duel> optionalDuel = duelRepository.findById(duelId);
-        return optionalDuel.orElse(null);
+        return optionalDuel.map(DuelDTO::toDto).orElse(null);
     }
 
-    Duel save(Duel duel) {
-        return duelRepository.save(duel);
+    DuelDTO save(DuelDTO duel) {
+        return DuelDTO.toDto(duelRepository.save(duel.toEntity()));
     }
 
-    Optional<Duel> findById(Long duelId) {
-        return duelRepository.findById(duelId);
+    Optional<DuelDTO> findById(Long duelId) {
+        return duelRepository.findById(duelId).map(DuelDTO::toDto);
     }
 
     void deleteById(Long duelId) {
@@ -37,8 +38,22 @@ class DuelService {
     }
 
 
-    List<Duel> findByCategory(String category) {
-        return duelRepository.findByCategory(category);
+    List<DuelDTO> findByCategory(String category) {
+        return duelRepository.findByCategory(category).stream().map(DuelDTO::toDto).toList();
+    }
+
+    public Set<DuelDTO> prepareFirstRound(Set<CompetitorDTO> competitors) {
+        List<CompetitorDTO> competitorsList = new ArrayList<>(competitors);
+        Set<DuelDTO> firstRound = new HashSet<>();
+        int position = 0;
+        for( int i = 0; i < competitors.size()/2; i=+2, position++) {
+            DuelDTO duel = new DuelDTO();
+            duel.setParticipant1(String.valueOf(competitorsList.get(i).getId()));
+            duel.setParticipant2(String.valueOf((i + 1) == competitorsList.size() ? null : competitorsList.get(i + 1).getId()));
+            duel.setPosition(position);
+            firstRound.add(duel);
+        }
+        return firstRound;
     }
 }
 
