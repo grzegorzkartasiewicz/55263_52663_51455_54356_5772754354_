@@ -8,6 +8,7 @@ class TournamentsApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 
 }
