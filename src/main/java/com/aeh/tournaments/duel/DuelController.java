@@ -25,8 +25,8 @@ import java.util.List;
     }
 
     @GetMapping("/{duelId}")
-    ResponseEntity<Duel> getDuelById(@PathVariable Long duelId) {
-        Duel duel = duelService.getDuelById(duelId);
+    ResponseEntity<DuelDTO> getDuelById(@PathVariable Long duelId) {
+        DuelDTO duel = duelService.getDuelById(duelId);
         if (duel != null) {
             return ResponseEntity.ok(duel);
         } else {
@@ -35,25 +35,25 @@ import java.util.List;
     }
 
     @GetMapping("/category/{category}")
-    List<Duel> getDuelsByCategory(@PathVariable String category) {
+    List<DuelDTO> getDuelsByCategory(@PathVariable String category) {
         return duelService.findByCategory(category);
     }
 
     @PostMapping
-    ResponseEntity<Duel> addDuel(@RequestBody Duel duel) {
-        Duel newDuel = duelService.save(duel);
+    ResponseEntity<DuelDTO> addDuel(@RequestBody DuelDTO duel) {
+        DuelDTO newDuel = duelService.save(duel);
         return new ResponseEntity<>(newDuel, HttpStatus.CREATED);
     }
 
     @PutMapping("/{duelId}")
-    ResponseEntity<Duel> updateDuel(@PathVariable Long duelId, @RequestBody Duel updatedDuel) {
-        Duel existingDuel = duelService.findById(duelId).orElse(null);
+    ResponseEntity<DuelDTO> updateDuel(@PathVariable Long duelId, @RequestBody DuelDTO updatedDuel) {
+        DuelDTO existingDuel = duelService.findById(duelId).orElse(null);
         if (existingDuel != null) {
             existingDuel.setParticipant1(updatedDuel.getParticipant1());
             existingDuel.setParticipant2(updatedDuel.getParticipant2());
             existingDuel.setWinner(updatedDuel.getWinner());
             existingDuel.setCategory(updatedDuel.getCategory());
-            Duel savedDuel = duelService.save(existingDuel);
+            DuelDTO savedDuel = duelService.save(existingDuel);
             return new ResponseEntity<>(savedDuel, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

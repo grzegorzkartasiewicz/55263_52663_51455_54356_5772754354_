@@ -32,4 +32,5 @@ public class Competitor {
     private String club;
     private int advancement;
     private int weight;
+    private boolean skippedLast;
 }

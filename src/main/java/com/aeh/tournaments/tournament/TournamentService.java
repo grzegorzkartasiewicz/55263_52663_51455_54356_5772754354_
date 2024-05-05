@@ -1,37 +1,45 @@
 package com.aeh.tournaments.tournament;
 
-import com.aeh.tournaments.competitors.Competitor;
-import com.aeh.tournaments.duel.Duel;
+import com.aeh.tournaments.competitors.CompetitorDTO;
+import com.aeh.tournaments.duel.DuelDTO;
+import com.aeh.tournaments.duel.DuelService;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 class TournamentService {
 
     private final TournamentRepository tournamentRepository;
+    private final DuelService duelService;
 
-    TournamentService(TournamentRepository tournamentRepository) {
+    TournamentService(TournamentRepository tournamentRepository, DuelService duelService) {
         this.tournamentRepository = tournamentRepository;
+        this.duelService = duelService;
     }
 
-    Tournament createTournament(Tournament tournament) {
-        return tournamentRepository.save(tournament);
+    TournamentReadDTO createTournament(TournamentDTO tournamentDTO) {
+        Tournament tournament = new Tournament();
+        Set<DuelDTO> duels = duelService.prepareFirstRound(tournamentDTO.getCompetitors());
+        tournament.setDuels(duels.stream().map(DuelDTO::toEntity).collect(Collectors.toSet()));
+        tournament.setNumberOfCompetitors(tournamentDTO.getCompetitors().size());
+        return TournamentReadDTO.toDto(tournamentRepository.save(tournament));
     }
 
-    Competitor getWinner(long tournamentId) {
+    CompetitorDTO getWinner(long tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow();
-        return tournament.getWinner();
+        return CompetitorDTO.toDto(tournament.getWinner());
     }
 
-    Set<Duel> getDuels(long tournamentId) {
+    Set<DuelDTO> getDuels(long tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow();
-        return tournament.getDuels();
+        return tournament.getDuels().stream().map(DuelDTO::toDto).collect(Collectors.toSet());
     }
 
-    Optional<Tournament> getTournamentById(long tournamentId) {
-        return tournamentRepository.findById(tournamentId);
+    Optional<TournamentReadDTO> getTournamentById(long tournamentId) {
+        return tournamentRepository.findById(tournamentId).map(TournamentReadDTO::toDto);
     }
 
 }

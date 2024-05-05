@@ -15,11 +15,11 @@ public class Duel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long duelId;
+    private long id;
     private String participant1;
     private String participant2;
     private String winner;
     private String category;
-
+    private int position;
 
 }
