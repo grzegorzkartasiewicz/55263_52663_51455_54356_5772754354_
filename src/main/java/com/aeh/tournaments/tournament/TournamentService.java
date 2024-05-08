@@ -22,7 +22,7 @@ class TournamentService {
 
     TournamentReadDTO createTournament(TournamentDTO tournamentDTO) {
         Tournament tournament = new Tournament();
-        Set<DuelDTO> duels = duelService.prepareFirstRound(tournamentDTO.getCompetitors());
+        Set<DuelDTO> duels = duelService.prepareRound(tournamentDTO.getCompetitors());
         tournament.setDuels(duels.stream().map(DuelDTO::toEntity).collect(Collectors.toSet()));
         tournament.setNumberOfCompetitors(tournamentDTO.getCompetitors().size());
         return TournamentReadDTO.toDto(tournamentRepository.save(tournament));

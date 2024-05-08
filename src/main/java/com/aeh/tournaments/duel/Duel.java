@@ -16,10 +16,9 @@ public class Duel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String participant1;
-    private String participant2;
+    private Long participant1;
+    private Long participant2;
     private String winner;
-    private String category;
     private int position;
 
 }
