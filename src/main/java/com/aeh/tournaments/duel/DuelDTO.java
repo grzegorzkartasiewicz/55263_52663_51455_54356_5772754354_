@@ -12,6 +12,7 @@ public class DuelDTO {
     private Long participant2;
     private String winner;
     private int position;
+    private int round;
 
     public Duel toEntity() {
         Duel duel = new Duel();
@@ -20,6 +21,7 @@ public class DuelDTO {
         duel.setParticipant2(participant2);
         duel.setWinner(winner);
         duel.setPosition(position);
+        duel.setRound(round);
         return duel;
     }
 
@@ -30,6 +32,7 @@ public class DuelDTO {
         duelDTO.setParticipant2(duel.getParticipant2());
         duelDTO.setWinner(duel.getWinner());
         duelDTO.setPosition(duel.getPosition());
+        duelDTO.setRound(duel.getRound());
         return duelDTO;
     }
 }

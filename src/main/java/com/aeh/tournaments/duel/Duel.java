@@ -20,5 +20,6 @@ public class Duel {
     private Long participant2;
     private String winner;
     private int position;
+    private int round;
 
 }

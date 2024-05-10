@@ -39,12 +39,8 @@ public class DuelService {
     }
 
 
-    List<DuelDTO> findByCategory(String category) {
-        return duelRepository.findByCategory(category).stream().map(DuelDTO::toDto).toList();
-    }
-
-    public Set<DuelDTO> prepareRound(Set<CompetitorDTO> competitors) {
-        Set<DuelDTO> round = new HashSet<>();
+    public Set<DuelDTO> prepareRound(Set<CompetitorDTO> competitors, int round) {
+        Set<DuelDTO> duels = new HashSet<>();
 
         Map<String, List<CompetitorDTO>> duelDraft = new HashMap<>();
         duelDraft.put(PARTICIPANT_1, new ArrayList<>());
@@ -62,11 +58,18 @@ public class DuelService {
         for (int i = 0; i < participant1.size(); i++) {
             DuelDTO duel = new DuelDTO();
             duel.setPosition(i);
+            duel.setRound(round);
             duel.setParticipant1(participant1.get(i).getId());
             duel.setParticipant2(participant2.get(i) == null ? null : participant2.get(i).getId());
-            round.add(duel);
+            duels.add(duel);
         }
-        return round;
+        return duels;
+    }
+
+    public DuelDTO updateDuel(long duelId, DuelDTO updatedDuel) {
+        DuelDTO existingDuel = findById(duelId).orElseThrow();
+        existingDuel.setWinner(updatedDuel.getWinner());
+        return DuelDTO.toDto(duelRepository.save(existingDuel.toEntity()));
     }
 }
 
