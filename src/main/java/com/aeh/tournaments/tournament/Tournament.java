@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.util.Set;
 
 @Entity
-@Table(name="Tournament")
+@Table(name="TOURNAMENT")
 @Getter
 @Setter
 class Tournament {

@@ -9,6 +9,6 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 public class TournamentDTO {
-    private long id;
     private Set<CompetitorDTO> competitors;
+    private int round;
 }

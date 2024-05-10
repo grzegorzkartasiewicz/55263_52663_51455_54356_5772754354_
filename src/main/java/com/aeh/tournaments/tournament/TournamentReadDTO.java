@@ -21,6 +21,7 @@ public class TournamentReadDTO {
         tournamentReadDTO.setId(tournament.getId());
         tournamentReadDTO.setDuels(tournament.getDuels().stream().map(DuelDTO::toDto).collect(Collectors.toSet()));
         tournamentReadDTO.setWinner(CompetitorDTO.toDto(tournament.getWinner()));
+        tournamentReadDTO.setNumberOfCompetitors(tournament.getNumberOfCompetitors());
         return tournamentReadDTO;
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-class CompetitorService {
+public class CompetitorService {
 
     private final CompetitorRepository competitorRepository;
 
@@ -15,6 +15,10 @@ class CompetitorService {
 
     CompetitorDTO save(CompetitorDTO competitor) {
         return CompetitorDTO.toDto(competitorRepository.save(competitor.toEntity()));
+    }
+
+    public CompetitorDTO getCompetitorById(long competitorId) {
+        return CompetitorDTO.toDto(competitorRepository.getReferenceById(competitorId));
     }
 
     List<CompetitorDTO> getAllCompetitors() {

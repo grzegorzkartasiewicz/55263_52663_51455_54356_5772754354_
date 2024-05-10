@@ -11,23 +11,16 @@ class DuelTest {
     void entityTest() {
 
         Duel duel = new Duel();
-        duel.setDuelId(1L);
-        duel.setParticipant1("John Smith");
-        duel.setParticipant2("Mark Zuckerberg");
+        duel.setId(1L);
+        duel.setParticipant1(1L);
+        duel.setParticipant2(2L);
         duel.setWinner("");
-        duel.setCategory("Boys under 7's");
 
         assertThat(duel).isInstanceOf(Duel.class);
-        assertThat(duel.getDuelId()).isEqualTo(1L);
-        assertThat(duel.getParticipant1()).isEqualTo("John Smith");
-        assertThat(duel.getParticipant2()).isEqualTo("Mark Zuckerberg");
+        assertThat(duel.getId()).isEqualTo(1L);
+        assertThat(duel.getParticipant1()).isEqualTo(1L);
+        assertThat(duel.getParticipant2()).isEqualTo(2L);
         assertThat(duel.getWinner()).isEmpty();
-        assertThat(duel.getCategory()).isEqualTo("Boys under 7's");
 
     }
-
-
-
-
-    }
-
+}

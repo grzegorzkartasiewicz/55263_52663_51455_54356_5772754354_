@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-class TournamentService {
+public class TournamentService {
 
     private final TournamentRepository tournamentRepository;
     private final DuelService duelService;
@@ -22,18 +22,18 @@ class TournamentService {
 
     TournamentReadDTO createTournament(TournamentDTO tournamentDTO) {
         Tournament tournament = new Tournament();
-        Set<DuelDTO> duels = duelService.prepareFirstRound(tournamentDTO.getCompetitors());
+        Set<DuelDTO> duels = duelService.prepareRound(tournamentDTO.getCompetitors(), tournamentDTO.getRound());
         tournament.setDuels(duels.stream().map(DuelDTO::toEntity).collect(Collectors.toSet()));
         tournament.setNumberOfCompetitors(tournamentDTO.getCompetitors().size());
         return TournamentReadDTO.toDto(tournamentRepository.save(tournament));
     }
 
-    CompetitorDTO getWinner(long tournamentId) {
+    public CompetitorDTO getWinner(long tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow();
         return CompetitorDTO.toDto(tournament.getWinner());
     }
 
-    Set<DuelDTO> getDuels(long tournamentId) {
+    public Set<DuelDTO> getDuels(long tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow();
         return tournament.getDuels().stream().map(DuelDTO::toDto).collect(Collectors.toSet());
     }
@@ -42,4 +42,10 @@ class TournamentService {
         return tournamentRepository.findById(tournamentId).map(TournamentReadDTO::toDto);
     }
 
+    TournamentReadDTO newRound(long tournamentId, TournamentDTO tournamentDTO) {
+        Tournament tournament = tournamentRepository.getReferenceById(tournamentId);
+        Set<DuelDTO> duels = duelService.prepareRound(tournamentDTO.getCompetitors(), tournamentDTO.getRound());
+        tournament.getDuels().addAll(duels.stream().map(DuelDTO::toEntity).collect(Collectors.toSet()));
+        return TournamentReadDTO.toDto(tournamentRepository.save(tournament));
+    }
 }

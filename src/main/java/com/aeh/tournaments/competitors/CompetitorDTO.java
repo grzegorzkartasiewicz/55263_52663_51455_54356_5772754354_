@@ -41,6 +41,9 @@ public class CompetitorDTO {
     }
 
     public static CompetitorDTO toDto(Competitor competitor) {
+        if (competitor == null) {
+            return new CompetitorDTO();
+        }
         CompetitorDTO competitorDTO = new CompetitorDTO();
         competitorDTO.setId(competitor.getId());
         competitorDTO.setName(competitor.getName());

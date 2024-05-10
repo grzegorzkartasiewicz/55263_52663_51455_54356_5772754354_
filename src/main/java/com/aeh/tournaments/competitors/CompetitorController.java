@@ -1,6 +1,8 @@
 package com.aeh.tournaments.competitors;
 
+import com.aeh.tournaments.tournament.TournamentService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -8,16 +10,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = CompetitorController.INTERFACE_COMPETITORS)
+@RequiredArgsConstructor
 class CompetitorController {
 
 
     public static final String INTERFACE_COMPETITORS = "/competitors";
 
     private final CompetitorService competitorService;
-
-    CompetitorController(CompetitorService competitorService) {
-        this.competitorService = competitorService;
-    }
+    private final TournamentService tournamentService;
 
     /**
      * @param competitor that needs to be created
@@ -43,5 +43,10 @@ class CompetitorController {
     ResponseEntity<Object> deleteCompetitor(@PathVariable Integer competitorId) {
         competitorService.delete(competitorId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{tournamentId}")
+    ResponseEntity<CompetitorDTO> getWinnerByTournamentId(@PathVariable long tournamentId) {
+        return ResponseEntity.ok(tournamentService.getWinner(tournamentId));
     }
 }

@@ -9,6 +9,8 @@ import java.util.*;
 @Service
 public class DuelService {
 
+    public static final String PARTICIPANT_1 = "participant1";
+    public static final String PARTICIPANT_2 = "participant2";
     private final DuelRepository duelRepository;
 
     DuelService(DuelRepository duelRepository) {
@@ -37,22 +39,37 @@ public class DuelService {
     }
 
 
-    List<DuelDTO> findByCategory(String category) {
-        return duelRepository.findByCategory(category).stream().map(DuelDTO::toDto).toList();
+    public Set<DuelDTO> prepareRound(Set<CompetitorDTO> competitors, int round) {
+        Set<DuelDTO> duels = new HashSet<>();
+
+        Map<String, List<CompetitorDTO>> duelDraft = new HashMap<>();
+        duelDraft.put(PARTICIPANT_1, new ArrayList<>());
+        duelDraft.put(PARTICIPANT_2, new ArrayList<>());
+        competitors.stream()
+                .sorted(Comparator.comparing(CompetitorDTO::getClub)).forEach(competitorDTO -> {
+                    if (duelDraft.get(PARTICIPANT_1).size() < competitors.size()/2) {
+                        duelDraft.get(PARTICIPANT_1).add(competitorDTO);
+                    } else {
+                        duelDraft.get(PARTICIPANT_2).add(competitorDTO);
+                    }
+                });
+        List<CompetitorDTO> participant1 = duelDraft.get(PARTICIPANT_1);
+        List<CompetitorDTO> participant2 = duelDraft.get(PARTICIPANT_2);
+        for (int i = 0; i < participant1.size(); i++) {
+            DuelDTO duel = new DuelDTO();
+            duel.setPosition(i);
+            duel.setRound(round);
+            duel.setParticipant1(participant1.get(i).getId());
+            duel.setParticipant2(participant2.get(i) == null ? null : participant2.get(i).getId());
+            duels.add(duel);
+        }
+        return duels;
     }
 
-    public Set<DuelDTO> prepareFirstRound(Set<CompetitorDTO> competitors) {
-        List<CompetitorDTO> competitorsList = new ArrayList<>(competitors);
-        Set<DuelDTO> firstRound = new HashSet<>();
-        int position = 0;
-        for( int i = 0; i < competitors.size()/2; i+= 2, position++) {
-            DuelDTO duel = new DuelDTO();
-            duel.setParticipant1(String.valueOf(competitorsList.get(i).getId()));
-            duel.setParticipant2(String.valueOf((i + 1) == competitorsList.size() ? null : competitorsList.get(i + 1).getId()));
-            duel.setPosition(position);
-            firstRound.add(duel);
-        }
-        return firstRound;
+    public DuelDTO updateDuel(long duelId, DuelDTO updatedDuel) {
+        DuelDTO existingDuel = findById(duelId).orElseThrow();
+        existingDuel.setWinner(updatedDuel.getWinner());
+        return DuelDTO.toDto(duelRepository.save(existingDuel.toEntity()));
     }
 }
 

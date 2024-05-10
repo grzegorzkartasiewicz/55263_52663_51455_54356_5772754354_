@@ -20,22 +20,17 @@ class TournamentController {
     }
 
     @GetMapping("/{tournamentId}")
-    ResponseEntity<TournamentReadDTO> getTournamentById(@PathVariable long tournamentId) {
-        return ResponseEntity.ok(tournamentService.getTournamentById(tournamentId).orElse(null));
-    }
-
-    @GetMapping("/{tournamentId}")
-    ResponseEntity<Set<DuelDTO>> getDuelsByTournamentId(@PathVariable long tournamentId) {
-        return ResponseEntity.ok(tournamentService.getDuels(tournamentId));
-    }
-
-    @GetMapping("/{tournamentId}")
-    ResponseEntity<CompetitorDTO> getWinnerByTournamentId(@PathVariable long tournamentId) {
-        return ResponseEntity.ok(tournamentService.getWinner(tournamentId));
+    ResponseEntity<TournamentReadDTO> getTournamentById(@PathVariable(name = "tournamentId") long tournamentId) {
+        return ResponseEntity.ok(tournamentService.getTournamentById(tournamentId).orElseThrow());
     }
 
     @PostMapping
     ResponseEntity<TournamentReadDTO> createTournament(@RequestBody TournamentDTO tournament) {
         return ResponseEntity.ok(tournamentService.createTournament(tournament));
+    }
+
+    @PutMapping("/{tournamentId}")
+    ResponseEntity<TournamentReadDTO> newRound(@PathVariable long tournamentId, @RequestBody TournamentDTO tournament) {
+        return ResponseEntity.ok(tournamentService.newRound(tournamentId, tournament));
     }
 }

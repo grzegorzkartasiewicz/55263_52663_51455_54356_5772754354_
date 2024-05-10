@@ -6,5 +6,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 interface DuelRepository extends JpaRepository<Duel, Long> {
-    List<Duel> findByCategory(String category);
 }
