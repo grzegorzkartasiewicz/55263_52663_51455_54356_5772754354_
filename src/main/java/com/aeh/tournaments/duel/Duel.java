@@ -1,10 +1,7 @@
 package com.aeh.tournaments.duel;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +15,10 @@ public class Duel {
     private long id;
     private Long participant1;
     private Long participant2;
-    private String winner;
+    private Long winner;
     private int position;
     private int round;
+    @Enumerated(value = EnumType.STRING)
+    private Branch branch;
 
 }

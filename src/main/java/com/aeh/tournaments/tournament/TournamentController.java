@@ -1,11 +1,7 @@
 package com.aeh.tournaments.tournament;
 
-import com.aeh.tournaments.competitors.CompetitorDTO;
-import com.aeh.tournaments.duel.DuelDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Set;
 
 @RestController
 @RequestMapping(value = TournamentController.INTERFACE_TOURNAMENTS)
@@ -26,11 +22,14 @@ class TournamentController {
 
     @PostMapping
     ResponseEntity<TournamentReadDTO> createTournament(@RequestBody TournamentDTO tournament) {
+        if (tournament.getCompetitors().size() < 4 || tournament.getCompetitors().size() > 32) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(tournamentService.createTournament(tournament));
     }
 
     @PutMapping("/{tournamentId}")
-    ResponseEntity<TournamentReadDTO> newRound(@PathVariable long tournamentId, @RequestBody TournamentDTO tournament) {
-        return ResponseEntity.ok(tournamentService.newRound(tournamentId, tournament));
+    ResponseEntity<TournamentReadDTO> newRound(@PathVariable long tournamentId, @RequestParam int round) {
+        return ResponseEntity.ok(tournamentService.newRound(tournamentId, round));
     }
 }

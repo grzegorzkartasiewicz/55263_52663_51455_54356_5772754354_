@@ -2,20 +2,21 @@ package com.aeh.tournaments.duel;
 
 
 import com.aeh.tournaments.competitors.CompetitorDTO;
+import com.aeh.tournaments.competitors.CompetitorService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class DuelService {
 
     public static final String PARTICIPANT_1 = "participant1";
     public static final String PARTICIPANT_2 = "participant2";
     private final DuelRepository duelRepository;
+    private final CompetitorService competitorService;
 
-    DuelService(DuelRepository duelRepository) {
-        this.duelRepository = duelRepository;
-    }
 
     List<Duel> getAllDuels() {
         return duelRepository.findAll();
@@ -38,8 +39,14 @@ public class DuelService {
         duelRepository.deleteById(duelId);
     }
 
+    public void updateWinner(long duelId, long winnerId) {
+        Duel referenceById = duelRepository.getReferenceById(duelId);
+        referenceById.setWinner(winnerId);
+        duelRepository.save(referenceById);
+    }
 
-    public Set<DuelDTO> prepareRound(Set<CompetitorDTO> competitors, int round) {
+
+    public Set<DuelDTO> prepareRound(Set<CompetitorDTO> competitors, int round, Branch branch) {
         Set<DuelDTO> duels = new HashSet<>();
 
         Map<String, List<CompetitorDTO>> duelDraft = new HashMap<>();
@@ -47,10 +54,18 @@ public class DuelService {
         duelDraft.put(PARTICIPANT_2, new ArrayList<>());
         competitors.stream()
                 .sorted(Comparator.comparing(CompetitorDTO::getClub)).forEach(competitorDTO -> {
-                    if (duelDraft.get(PARTICIPANT_1).size() < competitors.size()/2) {
-                        duelDraft.get(PARTICIPANT_1).add(competitorDTO);
+                    if (duelDraft.get(PARTICIPANT_1).size() < competitors.size()/2 + competitors.size()%2) {
+                        if (competitorDTO.isSkippedLast()) {
+                            duelDraft.get(PARTICIPANT_1).add(0, competitorDTO);
+                        } else {
+                            duelDraft.get(PARTICIPANT_1).add(competitorDTO);
+                        }
                     } else {
-                        duelDraft.get(PARTICIPANT_2).add(competitorDTO);
+                        if (competitorDTO.isSkippedLast()) {
+                            duelDraft.get(PARTICIPANT_2).add(0, competitorDTO);
+                        } else {
+                            duelDraft.get(PARTICIPANT_2).add(competitorDTO);
+                        }
                     }
                 });
         List<CompetitorDTO> participant1 = duelDraft.get(PARTICIPANT_1);
@@ -59,8 +74,13 @@ public class DuelService {
             DuelDTO duel = new DuelDTO();
             duel.setPosition(i);
             duel.setRound(round);
+            duel.setBranch(branch);
             duel.setParticipant1(participant1.get(i).getId());
-            duel.setParticipant2(participant2.get(i) == null ? null : participant2.get(i).getId());
+            duel.setParticipant2(participant2.size() == i ? null : participant2.get(i).getId());
+            if (duel.getParticipant2()==null) {
+                competitorService.setSkippedLast(participant1.get(i).getId());
+                duel.setWinner(participant1.get(i).getId());
+            }
             duels.add(duel);
         }
         return duels;
