@@ -1,19 +1,17 @@
 package com.aeh.tournaments.tournament;
 
 
-import com.aeh.tournaments.competitors.Competitor;
 import com.aeh.tournaments.competitors.CompetitorDTO;
 import com.aeh.tournaments.competitors.CompetitorService;
 import com.aeh.tournaments.duel.DuelService;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.aspectj.lang.annotation.Before;
+import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatusCode;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -51,23 +49,22 @@ class TournamentControllerIT {
 
         RestAssured.get("/tournaments/1")
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
+                .statusCode(HttpStatus.SC_OK)
                 .body("numberOfCompetitors", equalTo(2));
     }
 
     @Test
     void getTournamentByIdShouldReturnBadRequestIfTournamentNotPresentTest() {
         Tournament tournament = new Tournament();
-        tournament.setId(1L);
+        tournament.setId(Long.MAX_VALUE);
         tournament.setDuels(Collections.emptySet());
         tournament.setWinner(null);
         tournament.setNumberOfCompetitors(2);
         tournamentRepository.save(tournament);
 
-        RestAssured.get("/tournaments/2")
+        RestAssured.get("/tournaments/{tournamentId}", Long.MAX_VALUE)
                 .then()
-                .statusCode(500);
+                .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -75,7 +72,7 @@ class TournamentControllerIT {
         Set<CompetitorDTO> competitorDTOS = new HashSet<>();
         for (int i=0; i<10; i++) {
             CompetitorDTO competitorDTO = new CompetitorDTO();
-            competitorDTO.setId(i);
+            competitorDTO.setId(i+1);
             competitorDTO.setAge(18);
             competitorDTO.setGender("Male");
             competitorDTO.setCompetition("Kumite");
@@ -90,8 +87,7 @@ class TournamentControllerIT {
 
         RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
+                .statusCode(HttpStatus.SC_OK)
                 .body("numberOfCompetitors", equalTo(10))
                 .body("duels", hasSize(5));
     }
@@ -101,7 +97,7 @@ class TournamentControllerIT {
         Set<CompetitorDTO> competitorDTOS = new HashSet<>();
         for (int i=0; i<11; i++) {
             CompetitorDTO competitorDTO = new CompetitorDTO();
-            competitorDTO.setId(i);
+            competitorDTO.setId(i+1);
             competitorDTO.setAge(18);
             competitorDTO.setGender("Male");
             competitorDTO.setCompetition("Kumite");
@@ -116,8 +112,7 @@ class TournamentControllerIT {
 
         RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
+                .statusCode(HttpStatus.SC_OK)
                 .body("numberOfCompetitors", equalTo(11))
                 .body("duels", hasSize(6));
     }
@@ -129,7 +124,7 @@ class TournamentControllerIT {
 
         RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
                 .then()
-                .statusCode(400);
+                .statusCode(HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test
@@ -137,7 +132,7 @@ class TournamentControllerIT {
         Set<CompetitorDTO> competitorDTOS = new HashSet<>();
         for (int i=0; i<10; i++) {
             CompetitorDTO competitorDTO = new CompetitorDTO();
-            competitorDTO.setId(i);
+            competitorDTO.setId(i+1);
             competitorDTO.setAge(18);
             competitorDTO.setGender("Male");
             competitorDTO.setCompetition("Kumite");
@@ -150,22 +145,22 @@ class TournamentControllerIT {
         }
         TournamentDTO tournamentDTO = new TournamentDTO(competitorDTOS);
 
-        RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
+        int tournamentId = RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
+                .statusCode(HttpStatus.SC_OK)
                 .body("numberOfCompetitors", equalTo(10))
-                .body("duels", hasSize(5));
+                .body("duels", hasSize(5))
+                .extract().body().jsonPath().getInt("id");
 
-        Tournament referenceById = tournamentRepository.findById(1L).get();
-        referenceById.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
+        Tournament tournament = tournamentRepository.findById((long) tournamentId).orElseThrow();
+        tournament.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
 
-        RestAssured.with().param("round", 2).when().put("/tournaments/1")
+        RestAssured.with().param("round", 2).when().put("/tournaments/{tournamentId}", tournamentId)
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("numberOfCompetitors", equalTo(10))
-                .body("duels", hasSize(5));
+                .statusCode(HttpStatus.SC_OK)
+                .body("id", equalTo(tournamentId))
+                .body("numberOfCompetitors", equalTo(5))
+                .body("duels", hasSize(8));
     }
 
     @Test
@@ -173,7 +168,7 @@ class TournamentControllerIT {
         Set<CompetitorDTO> competitorDTOS = new HashSet<>();
         for (int i=0; i<11; i++) {
             CompetitorDTO competitorDTO = new CompetitorDTO();
-            competitorDTO.setId(i);
+            competitorDTO.setId(i+1);
             competitorDTO.setAge(18);
             competitorDTO.setGender("Male");
             competitorDTO.setCompetition("Kumite");
@@ -186,11 +181,21 @@ class TournamentControllerIT {
         }
         TournamentDTO tournamentDTO = new TournamentDTO(competitorDTOS);
 
-        RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
+        int tournamentId = RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
+                .statusCode(HttpStatus.SC_OK)
                 .body("numberOfCompetitors", equalTo(11))
-                .body("duels", hasSize(6));
+                .body("duels", hasSize(6))
+                .extract().body().jsonPath().getInt("id");
+
+        Tournament tournament = tournamentRepository.findById((long) tournamentId).orElseThrow();
+        tournament.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
+
+        RestAssured.with().param("round", 2).when().put("/tournaments/{tournamentId}", tournamentId)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("id", equalTo(tournamentId))
+                .body("numberOfCompetitors", equalTo(6))
+                .body("duels", hasSize(10));
     }
 }

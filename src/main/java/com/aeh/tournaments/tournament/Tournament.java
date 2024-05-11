@@ -17,7 +17,7 @@ class Tournament {
     @Id
     @GeneratedValue()
     private long id;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "duel_id")
     private Set<Duel> duels;
     private int numberOfCompetitors;

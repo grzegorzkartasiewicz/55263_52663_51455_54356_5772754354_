@@ -40,15 +40,13 @@ public class DuelService {
     }
 
     public void updateWinner(long duelId, long winnerId) {
-        Duel referenceById = duelRepository.getReferenceById(duelId);
-        referenceById.setWinner(winnerId);
-        duelRepository.save(referenceById);
+        Duel duel = duelRepository.findById(duelId).orElseThrow();
+        duel.setWinner(winnerId);
+        duelRepository.save(duel);
     }
 
 
     public Set<DuelDTO> prepareRound(Set<CompetitorDTO> competitors, int round, Branch branch) {
-        Set<DuelDTO> duels = new HashSet<>();
-
         Map<String, List<CompetitorDTO>> duelDraft = new HashMap<>();
         duelDraft.put(PARTICIPANT_1, new ArrayList<>());
         duelDraft.put(PARTICIPANT_2, new ArrayList<>());
@@ -63,6 +61,7 @@ public class DuelService {
                     } else {
                         if (competitorDTO.isSkippedLast()) {
                             duelDraft.get(PARTICIPANT_2).add(0, competitorDTO);
+                            competitorService.setSkippedLast(competitorDTO.getId());
                         } else {
                             duelDraft.get(PARTICIPANT_2).add(competitorDTO);
                         }
@@ -70,6 +69,11 @@ public class DuelService {
                 });
         List<CompetitorDTO> participant1 = duelDraft.get(PARTICIPANT_1);
         List<CompetitorDTO> participant2 = duelDraft.get(PARTICIPANT_2);
+        return setDuels(round, branch, participant1, participant2);
+    }
+
+    private Set<DuelDTO> setDuels(int round, Branch branch, List<CompetitorDTO> participant1, List<CompetitorDTO> participant2) {
+        Set<DuelDTO> duels = new HashSet<>();
         for (int i = 0; i < participant1.size(); i++) {
             DuelDTO duel = new DuelDTO();
             duel.setPosition(i);

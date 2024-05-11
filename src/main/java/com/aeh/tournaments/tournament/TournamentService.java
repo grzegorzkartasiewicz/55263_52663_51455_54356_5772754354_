@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Spliterator;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,7 +57,7 @@ public class TournamentService {
     }
 
     TournamentReadDTO newRound(long tournamentId, int round) {
-        Tournament tournament = tournamentRepository.getReferenceById(tournamentId);
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow();
         Set<CompetitorDTO> leftBranchCompetitors = tournament.getDuels().stream()
                 .filter(duel -> duel.getBranch() == Branch.LEFT && duel.getRound() == (round - 1))
                 .map(duel -> competitorService.getCompetitorById(duel.getWinner()))
@@ -73,6 +72,17 @@ public class TournamentService {
         duels.addAll(duelsLeft);
         duels.addAll(duelsRight);
         tournament.getDuels().addAll(duels.stream().map(DuelDTO::toEntity).collect(Collectors.toSet()));
+        tournament.setNumberOfCompetitors(countCompetitors(duels));
         return TournamentReadDTO.toDto(tournamentRepository.save(tournament));
+    }
+
+    private int countCompetitors(Set<DuelDTO> duels) {
+        return duels.stream().map(duelDTO -> {
+            if (duelDTO.getParticipant2() == null) {
+                return 1;
+            } else {
+                return 2;
+            }
+        }).mapToInt(Integer::intValue).sum();
     }
 }

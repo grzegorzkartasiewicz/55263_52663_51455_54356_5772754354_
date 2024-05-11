@@ -18,7 +18,7 @@ public class CompetitorService {
     }
 
     public CompetitorDTO getCompetitorById(long competitorId) {
-        return CompetitorDTO.toDto(competitorRepository.getReferenceById(competitorId));
+        return CompetitorDTO.toDto(competitorRepository.findById(competitorId).orElseThrow());
     }
 
     List<CompetitorDTO> getAllCompetitors() {
@@ -34,8 +34,8 @@ public class CompetitorService {
     }
 
     public void setSkippedLast(long competitorId) {
-        Competitor referenceById = competitorRepository.getReferenceById(competitorId);
-        referenceById.setSkippedLast(true);
-        competitorRepository.save(referenceById);
+        Competitor competitor = competitorRepository.findById(competitorId).orElseThrow();
+        competitor.setSkippedLast(!competitor.isSkippedLast());
+        competitorRepository.save(competitor);
     }
 }
