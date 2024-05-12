@@ -13,23 +13,29 @@ public class CompetitorService {
         this.competitorRepository = competitorRepository;
     }
 
-    CompetitorDTO save(CompetitorDTO competitor) {
+    public CompetitorDTO save(CompetitorDTO competitor) {
         return CompetitorDTO.toDto(competitorRepository.save(competitor.toEntity()));
     }
 
     public CompetitorDTO getCompetitorById(long competitorId) {
-        return CompetitorDTO.toDto(competitorRepository.getReferenceById(competitorId));
+        return CompetitorDTO.toDto(competitorRepository.findById(competitorId).orElseThrow());
     }
 
     List<CompetitorDTO> getAllCompetitors() {
         return competitorRepository.findAll().stream().map(CompetitorDTO::toDto).toList();
     }
 
-    CompetitorDTO update(CompetitorDTO competitor) {
+    public CompetitorDTO update(CompetitorDTO competitor) {
         return CompetitorDTO.toDto(competitorRepository.save(competitor.toEntity()));
     }
 
     void delete(long competitorId) {
         competitorRepository.deleteById(competitorId);
+    }
+
+    public void setSkippedLast(long competitorId) {
+        Competitor competitor = competitorRepository.findById(competitorId).orElseThrow();
+        competitor.setSkippedLast(!competitor.isSkippedLast());
+        competitorRepository.save(competitor);
     }
 }

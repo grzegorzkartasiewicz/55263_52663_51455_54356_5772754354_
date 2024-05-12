@@ -14,13 +14,13 @@ class DuelTest {
         duel.setId(1L);
         duel.setParticipant1(1L);
         duel.setParticipant2(2L);
-        duel.setWinner("");
+        duel.setWinner(1L);
 
         assertThat(duel).isInstanceOf(Duel.class);
         assertThat(duel.getId()).isEqualTo(1L);
         assertThat(duel.getParticipant1()).isEqualTo(1L);
         assertThat(duel.getParticipant2()).isEqualTo(2L);
-        assertThat(duel.getWinner()).isEmpty();
+        assertThat(duel.getWinner()).isEqualTo(1L);
 
     }
 }
