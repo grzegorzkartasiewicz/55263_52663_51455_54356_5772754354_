@@ -71,6 +71,12 @@ public class DuelService {
         existingDuel.setWinner(updatedDuel.getWinner());
         return DuelDTO.toDto(duelRepository.save(existingDuel.toEntity()));
     }
+
+    public List<DuelDTO> getDuelsByTournamentId(long tournamentId) {
+
+        return List.of();
+    }
+
 }
 
 
