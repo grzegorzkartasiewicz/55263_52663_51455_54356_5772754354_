@@ -95,6 +95,16 @@ public class DuelService {
         existingDuel.setWinner(updatedDuel.getWinner());
         return DuelDTO.toDto(duelRepository.save(existingDuel.toEntity()));
     }
+
+    public Set<DuelDTO> prepareFinal(List<CompetitorDTO> finalists, int round) {
+        DuelDTO duel = new DuelDTO();
+        duel.setPosition(0);
+        duel.setRound(round);
+        duel.setBranch(Branch.FINAL);
+        duel.setParticipant1(finalists.get(0).getId());
+        duel.setParticipant2(finalists.get(1).getId());
+        return Set.of(duel);
+    }
 }
 
 
