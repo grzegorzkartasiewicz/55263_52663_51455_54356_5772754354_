@@ -32,4 +32,8 @@ class TournamentController {
     ResponseEntity<TournamentReadDTO> newRound(@PathVariable long tournamentId, @RequestParam int round) {
         return ResponseEntity.ok(tournamentService.newRound(tournamentId, round));
     }
+
+    @PutMapping("/losing/{tournamentId}")
+    ResponseEntity<TournamentReadDTO> countLosingBracket(@PathVariable long tournamentId) {
+        return ResponseEntity.ok(tournamentService.createLosingBranches(tournamentId));    }
 }
