@@ -26,9 +26,9 @@ import java.util.Set;
 
     @GetMapping("/{duelId}")
     ResponseEntity<DuelDTO> getDuelById(@PathVariable Long duelId) {
-        DuelDTO duel = duelService.getDuelById(duelId);
-        if (duel != null) {
-            return ResponseEntity.ok(duel);
+        DuelDTO duelDTO = duelService.getDuelById(duelId);
+        if (duelDTO != null) {
+            return ResponseEntity.ok(duelDTO);
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -51,8 +51,9 @@ import java.util.Set;
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/{tournamentId}")
+    @GetMapping("/tournement/{tournamentId}")
     ResponseEntity<Set<DuelDTO>> getDuelsByTournamentId(@PathVariable long tournamentId) {
-        return ResponseEntity.ok(tournamentService.getDuels(tournamentId));
+        List<DuelDTO> duels = duelService.getDuelsByTournamentId(tournamentId);
+        return ResponseEntity.ok((Set<DuelDTO>) duels);
     }
 }

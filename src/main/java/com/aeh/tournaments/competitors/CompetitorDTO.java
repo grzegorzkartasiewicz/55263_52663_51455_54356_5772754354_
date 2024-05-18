@@ -47,7 +47,7 @@ public class CompetitorDTO {
         CompetitorDTO competitorDTO = new CompetitorDTO();
         competitorDTO.setId(competitor.getId());
         competitorDTO.setName(competitor.getName());
-        competitorDTO.setSurname(competitorDTO.getSurname());
+        competitorDTO.setSurname(competitor.getSurname());
         competitorDTO.setAge(competitor.getAge());
         competitorDTO.setGender(competitor.getGender());
         competitorDTO.setCompetition(competitor.getCompetition());
