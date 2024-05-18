@@ -96,6 +96,12 @@ public class DuelService {
         return DuelDTO.toDto(duelRepository.save(existingDuel.toEntity()));
     }
 
+    public List<DuelDTO> getDuelsByTournamentId(long tournamentId) {
+
+        return List.of();
+    }
+
+
     public Set<DuelDTO> prepareFinal(List<CompetitorDTO> finalists, int round) {
         DuelDTO duel = new DuelDTO();
         duel.setPosition(0);
