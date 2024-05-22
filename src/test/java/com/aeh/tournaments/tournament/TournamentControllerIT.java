@@ -198,4 +198,85 @@ class TournamentControllerIT {
                 .body("numberOfCompetitors", equalTo(6))
                 .body("duels", hasSize(10));
     }
+
+    @Test
+    void e2eTournamentTest() {
+        Set<CompetitorDTO> competitorDTOS = new HashSet<>();
+        for (int i=0; i<10; i++) {
+            CompetitorDTO competitorDTO = new CompetitorDTO();
+            competitorDTO.setId(i+1);
+            competitorDTO.setAge(18);
+            competitorDTO.setGender("Male");
+            competitorDTO.setCompetition("Kumite");
+            competitorDTO.setAdvancement(1);
+            competitorDTO.setName("John");
+            competitorDTO.setSurname("Smith");
+            competitorDTO.setClub("Dragon " + i);
+            competitorService.save(competitorDTO);
+            competitorDTOS.add(competitorDTO);
+        }
+        TournamentDTO tournamentDTO = new TournamentDTO(competitorDTOS);
+
+        int tournamentId = RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("numberOfCompetitors", equalTo(10))
+                .body("duels", hasSize(5))
+                .extract().body().jsonPath().getInt("id");
+
+        Tournament tournament = tournamentRepository.findById((long) tournamentId).orElseThrow();
+        tournament.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
+
+        TournamentReadDTO tournamentReadDTO = RestAssured.with().param("round", 2).when().put("/tournaments/{tournamentId}", tournamentId)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("id", equalTo(tournamentId))
+                .body("numberOfCompetitors", equalTo(5))
+                .body("duels", hasSize(3))
+                .extract().body().as(TournamentReadDTO.class);
+
+        tournamentReadDTO.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
+
+        tournamentReadDTO = RestAssured.with().param("round", 3).when().put("/tournaments/{tournamentId}", tournamentId)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("id", equalTo(tournamentId))
+                .body("numberOfCompetitors", equalTo(3))
+                .body("duels", hasSize(2))
+                .extract().body().as(TournamentReadDTO.class);
+
+        tournamentReadDTO.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
+
+        tournamentReadDTO = RestAssured.with().param("round", 4).when().put("/tournaments/{tournamentId}", tournamentId)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("id", equalTo(tournamentId))
+                .body("numberOfCompetitors", equalTo(2))
+                .body("duels", hasSize(1))
+                .extract().body().as(TournamentReadDTO.class); // result of this duel is first and second place
+
+        tournamentReadDTO.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
+
+        tournamentReadDTO = RestAssured.put("/tournaments/losing/{tournamentId}", tournamentId)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("id", equalTo(tournamentId))
+                .body("numberOfCompetitors", equalTo(7))
+                .body("duels", hasSize(4))
+                .extract().body().as(TournamentReadDTO.class);
+
+        tournamentReadDTO.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
+
+        tournamentReadDTO = RestAssured.with().param("round", 6).when().put("/tournaments/{tournamentId}", tournamentId)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("id", equalTo(tournamentId))
+                .body("numberOfCompetitors", equalTo(4))
+                .body("duels", hasSize(2)) // result of these duels are going to be two third places
+                .extract().body().as(TournamentReadDTO.class);
+
+        tournamentReadDTO.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
+
+        //TODO add check for podium calling podium endpoint
+    }
 }

@@ -51,9 +51,9 @@ import java.util.Set;
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/tournement/{tournamentId}")
+    @GetMapping("/tournament/{tournamentId}")
     ResponseEntity<Set<DuelDTO>> getDuelsByTournamentId(@PathVariable long tournamentId) {
-        List<DuelDTO> duels = duelService.getDuelsByTournamentId(tournamentId);
-        return ResponseEntity.ok((Set<DuelDTO>) duels);
+        Set<DuelDTO> duels = tournamentService.getDuels(tournamentId);
+        return ResponseEntity.ok(duels);
     }
 }
