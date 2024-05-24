@@ -3,6 +3,7 @@ package com.aeh.tournaments.duel;
 
 import com.aeh.tournaments.competitors.CompetitorDTO;
 import com.aeh.tournaments.competitors.CompetitorService;
+import com.aeh.tournaments.tournament.TournamentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -95,12 +96,6 @@ public class DuelService {
         existingDuel.setWinner(updatedDuel.getWinner());
         return DuelDTO.toDto(duelRepository.save(existingDuel.toEntity()));
     }
-
-    public List<DuelDTO> getDuelsByTournamentId(long tournamentId) {
-
-        return List.of();
-    }
-
 
     public Set<DuelDTO> prepareFinal(List<CompetitorDTO> finalists, int round) {
         DuelDTO duel = new DuelDTO();
