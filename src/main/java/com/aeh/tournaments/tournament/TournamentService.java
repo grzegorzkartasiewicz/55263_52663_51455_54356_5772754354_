@@ -127,4 +127,38 @@ public class TournamentService {
         tournament.setNumberOfCompetitors(countCompetitors(duels));
         return TournamentReadDTO.toDto(tournamentRepository.save(tournament));
     }
+
+    public List<CompetitorDTO> getPodium(long tournamentId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new NoSuchElementException("Tournament not found"));
+
+        CompetitorDTO firstPlace = CompetitorDTO.toDto(tournament.getWinner());
+
+        Duel finalDuel = tournament.getDuels().stream()
+                .max(Comparator.comparingInt(Duel::getRound))
+                .orElseThrow();
+
+        Long secondPlaceId = finalDuel.getWinner().equals(finalDuel.getParticipant1())
+                ? finalDuel.getParticipant2()
+                : finalDuel.getParticipant1();
+        CompetitorDTO secondPlace = CompetitorDTO.toDto(competitorService.getCompetitorById(secondPlaceId));
+
+        Set<Duel> thirdPlaceDuels = tournament.getDuels().stream()
+                .filter(duel -> duel.getRound() == finalDuel.getRound() - 1)
+                .collect(Collectors.toSet());
+
+        CompetitorDTO thirdPlace = thirdPlaceDuels.stream()
+                .map(duel -> {
+                    Long thirdPlaceId = duel.getWinner().equals(duel.getParticipant1())
+                            ? duel.getParticipant2()
+                            : duel.getParticipant1();
+                    return competitorService.getCompetitorById(thirdPlaceId);
+                })
+                .filter(Objects::nonNull)
+                .map(CompetitorDTO::toDto)
+                .findFirst()
+                .orElseThrow();
+
+        return Arrays.asList(firstPlace, secondPlace, thirdPlace);
+    }
 }

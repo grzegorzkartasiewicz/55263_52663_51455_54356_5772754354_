@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CompetitorDTO {
+public class CompetitorDTO extends Competitor {
     private long id;
     @NotNull
     private String name;

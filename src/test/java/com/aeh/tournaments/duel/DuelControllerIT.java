@@ -56,7 +56,7 @@ public class DuelControllerIT {
         duelDTO.setId(1L);
         duelDTO.setParticipant1(1L);
         duelDTO.setParticipant2(2L);
-        duelDTO.setWinner("Winner");
+        duelDTO.setWinner(1L);
 
         duelService.save(duelDTO);
 
@@ -70,7 +70,7 @@ public class DuelControllerIT {
                 .body("id", equalTo(1))
                 .body("participant1", equalTo(1))
                 .body("participant2", equalTo(2))
-                .body("winner", equalTo("Winner"));
+                .body("winner", equalTo(1));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class DuelControllerIT {
         duelDTO.setId(1L);
         duelDTO.setParticipant1(1L);
         duelDTO.setParticipant2(2L);
-        duelDTO.setWinner("Winner");
+        duelDTO.setWinner(1L);
 
         DuelService duelService = mock(DuelService.class);
         when(duelService.save(duelDTO)).thenReturn(duelDTO);
@@ -107,7 +107,7 @@ public class DuelControllerIT {
                 .body("id", equalTo(1))
                 .body("participant1", equalTo(1))
                 .body("participant2", equalTo(2))
-                .body("winner", equalTo("Winner"));
+                .body("winner", equalTo(1));
     }
 
     @Test
@@ -116,7 +116,7 @@ public class DuelControllerIT {
         duelDTO.setId(1L);
         duelDTO.setParticipant1(1L);
         duelDTO.setParticipant2(2L);
-        duelDTO.setWinner("Winner");
+        duelDTO.setWinner(1L);
         DuelService duelService = mock(DuelService.class);
         when(duelService.updateDuel(1L, duelDTO)).thenReturn(duelDTO);
 
@@ -126,11 +126,11 @@ public class DuelControllerIT {
                 .when()
                 .put("/duels/1")
                 .then()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(200)
                 .body("id", equalTo(1))
                 .body("participant1", equalTo(1))
                 .body("participant2", equalTo(2))
-                .body("winner", equalTo("Winner"));
+                .body("winner", equalTo(1));
     }
 
     @Test
