@@ -37,11 +37,12 @@ class TournamentController {
     }
 
     @PutMapping("/losing/{tournamentId}")
-    ResponseEntity<TournamentReadDTO> countLosingBracket(@PathVariable long tournamentId) {
-        return ResponseEntity.ok(tournamentService.createLosingBranches(tournamentId));    }
-
-    @GetMapping("/{tournamentId}/podium")
-    public List<CompetitorDTO> getPodium(@PathVariable long tournamentId) {
-        return tournamentService.getPodium(tournamentId);
+    ResponseEntity<TournamentReadDTO> createLosingBracket(@PathVariable long tournamentId) {
+        return ResponseEntity.ok(tournamentService.createLosingBranches(tournamentId));
     }
+
+//    @GetMapping("/podium/{tournamentId}")
+//    ResponseEntity<TournamentPodiumDTO> getPodium(@PathVariable long tournamentId) {
+//        return ResponseEntity.ok(tournamentService.getPodium(tournamentId));
+//    }
 }

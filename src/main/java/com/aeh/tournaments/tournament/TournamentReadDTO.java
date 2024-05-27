@@ -24,4 +24,15 @@ public class TournamentReadDTO {
         tournamentReadDTO.setNumberOfCompetitors(tournament.getNumberOfCompetitors());
         return tournamentReadDTO;
     }
+
+    static TournamentReadDTO toDtoInRound(Tournament tournament, int round) {
+        TournamentReadDTO tournamentReadDTO = new TournamentReadDTO();
+        tournamentReadDTO.setId(tournament.getId());
+        tournamentReadDTO.setDuels(tournament.getDuels().stream()
+                .filter(duel -> duel.getRound() == round)
+                .map(DuelDTO::toDto).collect(Collectors.toSet()));
+        tournamentReadDTO.setWinner(CompetitorDTO.toDto(tournament.getWinner()));
+        tournamentReadDTO.setNumberOfCompetitors(tournament.getNumberOfCompetitors());
+        return tournamentReadDTO;
+    }
 }
