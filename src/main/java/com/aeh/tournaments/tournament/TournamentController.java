@@ -1,5 +1,6 @@
 package com.aeh.tournaments.tournament;
 
+import com.aeh.tournaments.competitors.CompetitorDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,8 +39,11 @@ class TournamentController {
         return ResponseEntity.ok(tournamentService.createLosingBranches(tournamentId));
     }
 
-//    @GetMapping("/podium/{tournamentId}")
-//    ResponseEntity<TournamentPodiumDTO> getPodium(@PathVariable long tournamentId) {
-//        return ResponseEntity.ok(tournamentService.getPodium(tournamentId));
-//    }
+    @GetMapping("/podium/{tournamentId}")
+    ResponseEntity<TournamentPodiumDTO> getPodium(@PathVariable long tournamentId) {
+        return ResponseEntity.ok(tournamentService.getPodium(tournamentId));
+    }
+
+    public record TournamentPodiumDTO (CompetitorDTO winner, CompetitorDTO secondPlace, CompetitorDTO thirdPlaceLeft, CompetitorDTO thirdPlaceRight) {
+    }
 }

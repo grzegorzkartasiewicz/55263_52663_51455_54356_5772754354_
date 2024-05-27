@@ -8,7 +8,6 @@ import com.aeh.tournaments.duel.DuelDTO;
 import com.aeh.tournaments.duel.DuelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.comparator.Comparators;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -128,7 +127,35 @@ public class TournamentService {
         return TournamentReadDTO.toDtoInRound(tournamentRepository.save(tournament), round);
     }
 
-//    public TournamentPodiumDTO getPodium(long tournamentId) {
-//        return null;
-//    }
+    public TournamentController.TournamentPodiumDTO getPodium(long tournamentId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new NoSuchElementException("Tournament not found"));
+        List<Duel> duels = tournament.getDuels().stream().sorted(Comparator.comparing(Duel::getRound).reversed()).toList();
+
+        Duel finalDuel = duels.stream()
+                .filter(duel -> Branch.FINAL.equals(duel.getBranch()))
+                .findFirst()
+                .orElseThrow();
+
+        CompetitorDTO firstPlace = competitorService.getCompetitorById(finalDuel.getWinner());
+
+        Long secondPlaceId = finalDuel.getWinner().equals(finalDuel.getParticipant1())
+                ? finalDuel.getParticipant2()
+                : finalDuel.getParticipant1();
+        CompetitorDTO secondPlace = competitorService.getCompetitorById(secondPlaceId);
+
+        Duel thirdPlace1 = duels.get(0);
+        Duel thirdPlace2 = duels.get(1);
+        CompetitorDTO thirdPlaceLeft;
+        CompetitorDTO thirdPlaceRight;
+        if (Branch.LEFT.equals(thirdPlace1.getBranch())) {
+            thirdPlaceLeft = competitorService.getCompetitorById(thirdPlace1.getWinner());
+            thirdPlaceRight = competitorService.getCompetitorById(thirdPlace2.getWinner());
+        } else {
+            thirdPlaceLeft = competitorService.getCompetitorById(thirdPlace2.getWinner());
+            thirdPlaceRight = competitorService.getCompetitorById(thirdPlace1.getWinner());
+        }
+
+        return new TournamentController.TournamentPodiumDTO(firstPlace, secondPlace, thirdPlaceLeft, thirdPlaceRight);
+    }
 }

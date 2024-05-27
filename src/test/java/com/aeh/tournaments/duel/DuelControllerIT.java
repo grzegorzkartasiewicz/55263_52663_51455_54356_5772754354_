@@ -126,7 +126,7 @@ public class DuelControllerIT {
                 .when()
                 .put("/duels/1")
                 .then()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(200)
                 .body("id", equalTo(1))
                 .body("participant1", equalTo(1))
                 .body("participant2", equalTo(2))
