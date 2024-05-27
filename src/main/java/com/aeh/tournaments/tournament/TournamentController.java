@@ -4,8 +4,6 @@ import com.aeh.tournaments.competitors.CompetitorDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping(value = TournamentController.INTERFACE_TOURNAMENTS)
 class TournamentController {
@@ -41,8 +39,11 @@ class TournamentController {
         return ResponseEntity.ok(tournamentService.createLosingBranches(tournamentId));
     }
 
-//    @GetMapping("/podium/{tournamentId}")
-//    ResponseEntity<TournamentPodiumDTO> getPodium(@PathVariable long tournamentId) {
-//        return ResponseEntity.ok(tournamentService.getPodium(tournamentId));
-//    }
+    @GetMapping("/podium/{tournamentId}")
+    ResponseEntity<TournamentPodiumDTO> getPodium(@PathVariable long tournamentId) {
+        return ResponseEntity.ok(tournamentService.getPodium(tournamentId));
+    }
+
+    public record TournamentPodiumDTO (CompetitorDTO winner, CompetitorDTO secondPlace, CompetitorDTO thirdPlaceLeft, CompetitorDTO thirdPlaceRight) {
+    }
 }

@@ -3,6 +3,8 @@ package com.aeh.tournaments.tournament;
 
 import com.aeh.tournaments.competitors.CompetitorDTO;
 import com.aeh.tournaments.competitors.CompetitorService;
+import com.aeh.tournaments.duel.Branch;
+import com.aeh.tournaments.duel.DuelDTO;
 import com.aeh.tournaments.duel.DuelService;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -257,6 +259,11 @@ class TournamentControllerIT {
 
         tournamentReadDTO.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
 
+
+        DuelDTO finalDuel = tournamentReadDTO.getDuels().stream().findFirst().orElseThrow();
+        Long winnerId = finalDuel.getParticipant1();
+        Long secondPlaceId = finalDuel.getParticipant2();
+
         tournamentReadDTO = RestAssured.put("/tournaments/losing/{tournamentId}", tournamentId)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
@@ -276,7 +283,22 @@ class TournamentControllerIT {
                 .extract().body().as(TournamentReadDTO.class);
 
         tournamentReadDTO.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
+        Long thirdPlaceRight = 0L;
+        Long thirdPlaceLeft = 0L;
+        for (DuelDTO duelDTO : tournamentReadDTO.getDuels()) {
+            if (Branch.LEFT.equals(duelDTO.getBranch())) {
+                thirdPlaceLeft = duelDTO.getParticipant1();
+            } else {
+                thirdPlaceRight = duelDTO.getParticipant1();
+            }
+        }
 
-        //TODO add check for podium calling podium endpoint
+        RestAssured.get("/tournaments/podium/{tournamentId}", tournamentId)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body("winner.id", equalTo(winnerId.intValue()))
+                .body("secondPlace.id", equalTo(secondPlaceId.intValue()))
+                .body("thirdPlaceLeft.id", equalTo(thirdPlaceLeft.intValue()))
+                .body("thirdPlaceRight.id", equalTo(thirdPlaceRight.intValue()));
     }
 }

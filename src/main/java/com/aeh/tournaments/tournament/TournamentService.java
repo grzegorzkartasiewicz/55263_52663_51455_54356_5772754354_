@@ -8,7 +8,6 @@ import com.aeh.tournaments.duel.DuelDTO;
 import com.aeh.tournaments.duel.DuelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.comparator.Comparators;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -128,37 +127,35 @@ public class TournamentService {
         return TournamentReadDTO.toDtoInRound(tournamentRepository.save(tournament), round);
     }
 
-    public List<CompetitorDTO> getPodium(long tournamentId) {
+    public TournamentController.TournamentPodiumDTO getPodium(long tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new NoSuchElementException("Tournament not found"));
+        List<Duel> duels = tournament.getDuels().stream().sorted(Comparator.comparing(Duel::getRound).reversed()).toList();
 
-        CompetitorDTO firstPlace = CompetitorDTO.toDto(tournament.getWinner());
-
-        Duel finalDuel = tournament.getDuels().stream()
-                .max(Comparator.comparingInt(Duel::getRound))
+        Duel finalDuel = duels.stream()
+                .filter(duel -> Branch.FINAL.equals(duel.getBranch()))
+                .findFirst()
                 .orElseThrow();
+
+        CompetitorDTO firstPlace = CompetitorDTO.toDto(competitorService.getCompetitorById(finalDuel.getWinner()));
 
         Long secondPlaceId = finalDuel.getWinner().equals(finalDuel.getParticipant1())
                 ? finalDuel.getParticipant2()
                 : finalDuel.getParticipant1();
         CompetitorDTO secondPlace = CompetitorDTO.toDto(competitorService.getCompetitorById(secondPlaceId));
 
-        Set<Duel> thirdPlaceDuels = tournament.getDuels().stream()
-                .filter(duel -> duel.getRound() == finalDuel.getRound() - 1)
-                .collect(Collectors.toSet());
+        Duel thirdPlace1 = duels.get(0);
+        Duel thirdPlace2 = duels.get(1);
+        CompetitorDTO thirdPlaceLeft;
+        CompetitorDTO thirdPlaceRight;
+        if (Branch.LEFT.equals(thirdPlace1.getBranch())) {
+            thirdPlaceLeft = CompetitorDTO.toDto(competitorService.getCompetitorById(thirdPlace1.getWinner()));
+            thirdPlaceRight = CompetitorDTO.toDto(competitorService.getCompetitorById(thirdPlace2.getWinner()));
+        } else {
+            thirdPlaceLeft = CompetitorDTO.toDto(competitorService.getCompetitorById(thirdPlace2.getWinner()));
+            thirdPlaceRight = CompetitorDTO.toDto(competitorService.getCompetitorById(thirdPlace1.getWinner()));
+        }
 
-        CompetitorDTO thirdPlace = thirdPlaceDuels.stream()
-                .map(duel -> {
-                    Long thirdPlaceId = duel.getWinner().equals(duel.getParticipant1())
-                            ? duel.getParticipant2()
-                            : duel.getParticipant1();
-                    return competitorService.getCompetitorById(thirdPlaceId);
-                })
-                .filter(Objects::nonNull)
-                .map(CompetitorDTO::toDto)
-                .findFirst()
-                .orElseThrow();
-
-        return Arrays.asList(firstPlace, secondPlace, thirdPlace);
+        return new TournamentController.TournamentPodiumDTO(firstPlace, secondPlace, thirdPlaceLeft, thirdPlaceRight);
     }
 }
