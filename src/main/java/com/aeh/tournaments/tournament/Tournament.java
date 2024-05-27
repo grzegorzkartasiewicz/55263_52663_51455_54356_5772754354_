@@ -20,7 +20,14 @@ class Tournament {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "duel_id")
     private Set<Duel> duels;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "competitor_id")
+    private Set<Competitor> competitors;
     private int numberOfCompetitors;
     @ManyToOne
     private Competitor winner;
+    private String tournamentName;
+    private String tournamentData;
+    private String category;
+    private String email;
 }

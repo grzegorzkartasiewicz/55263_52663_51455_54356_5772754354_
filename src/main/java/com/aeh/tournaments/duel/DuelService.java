@@ -91,9 +91,9 @@ public class DuelService {
         return duels;
     }
 
-    public DuelDTO updateDuel(long duelId, DuelDTO updatedDuel) {
+    public DuelDTO updateDuel(long duelId, long competitorId) {
         DuelDTO existingDuel = findById(duelId).orElseThrow();
-        existingDuel.setWinner(updatedDuel.getWinner());
+        existingDuel.setWinner(competitorId);
         return DuelDTO.toDto(duelRepository.save(existingDuel.toEntity()));
     }
 

@@ -25,7 +25,7 @@ import java.util.Set;
     }
 
     @GetMapping("/{duelId}")
-    ResponseEntity<DuelDTO> getDuelById(@PathVariable Long duelId) {
+    ResponseEntity<DuelDTO> getDuelById(@PathVariable long duelId) {
         DuelDTO duelDTO = duelService.getDuelById(duelId);
         if (duelDTO != null) {
             return ResponseEntity.ok(duelDTO);
@@ -40,13 +40,13 @@ import java.util.Set;
         return new ResponseEntity<>(newDuel, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{duelId}")
-    ResponseEntity<DuelDTO> updateDuel(@PathVariable Long duelId, @RequestBody DuelDTO updatedDuel) {
-        return ResponseEntity.ok(duelService.updateDuel(duelId, updatedDuel));
+    @PatchMapping("/{duelId}/winner/{competitorId}")
+    ResponseEntity<DuelDTO> updateDuel(@PathVariable long duelId, @PathVariable long competitorId) {
+        return ResponseEntity.ok(duelService.updateDuel(duelId, competitorId));
     }
 
     @DeleteMapping("/{duelId}")
-     ResponseEntity<Void> deleteDuel(@PathVariable Long duelId) {
+     ResponseEntity<Void> deleteDuel(@PathVariable long duelId) {
         duelService.deleteById(duelId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

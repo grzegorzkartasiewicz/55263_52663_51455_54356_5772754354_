@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CompetitorDTO {
-    private long id;
+    private Long id;
     @NotNull
     private String name;
     @NotNull

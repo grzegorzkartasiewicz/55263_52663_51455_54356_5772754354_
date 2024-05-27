@@ -18,7 +18,7 @@ import lombok.Setter;
 public class Competitor {
     @Id
     @GeneratedValue()
-    private long id;
+    private Long id;
     @NotNull
     private String name;
     @NotNull

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = CompetitorController.INTERFACE_COMPETITORS)
@@ -28,19 +29,25 @@ class CompetitorController {
         return ResponseEntity.ok(competitorService.save(competitor));
     }
 
+    @PostMapping("/bulk")
+    ResponseEntity<CompetitorDTO> createCompetitor(@RequestBody @Valid Set<CompetitorDTO> competitors) {
+        competitors.forEach(competitorService::save);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping
     ResponseEntity<List<CompetitorDTO>> getAllCompetitors() {
         return ResponseEntity.ok(competitorService.getAllCompetitors());
     }
 
     @PutMapping(value = "/{competitorId}")
-    ResponseEntity<CompetitorDTO> updateCompetitor(@PathVariable Integer competitorId, @RequestBody @Valid CompetitorDTO competitor) {
+    ResponseEntity<CompetitorDTO> updateCompetitor(@PathVariable Long competitorId, @RequestBody @Valid CompetitorDTO competitor) {
         competitor.setId(competitorId);
         return ResponseEntity.ok(competitorService.update(competitor));
     }
 
     @DeleteMapping(value = "/{competitorId}")
-    ResponseEntity<Object> deleteCompetitor(@PathVariable Integer competitorId) {
+    ResponseEntity<Object> deleteCompetitor(@PathVariable Long competitorId) {
         competitorService.delete(competitorId);
         return ResponseEntity.ok().build();
     }
