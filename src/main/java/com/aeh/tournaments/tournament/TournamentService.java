@@ -137,23 +137,23 @@ public class TournamentService {
                 .findFirst()
                 .orElseThrow();
 
-        CompetitorDTO firstPlace = CompetitorDTO.toDto(competitorService.getCompetitorById(finalDuel.getWinner()));
+        CompetitorDTO firstPlace = competitorService.getCompetitorById(finalDuel.getWinner());
 
         Long secondPlaceId = finalDuel.getWinner().equals(finalDuel.getParticipant1())
                 ? finalDuel.getParticipant2()
                 : finalDuel.getParticipant1();
-        CompetitorDTO secondPlace = CompetitorDTO.toDto(competitorService.getCompetitorById(secondPlaceId));
+        CompetitorDTO secondPlace = competitorService.getCompetitorById(secondPlaceId);
 
         Duel thirdPlace1 = duels.get(0);
         Duel thirdPlace2 = duels.get(1);
         CompetitorDTO thirdPlaceLeft;
         CompetitorDTO thirdPlaceRight;
         if (Branch.LEFT.equals(thirdPlace1.getBranch())) {
-            thirdPlaceLeft = CompetitorDTO.toDto(competitorService.getCompetitorById(thirdPlace1.getWinner()));
-            thirdPlaceRight = CompetitorDTO.toDto(competitorService.getCompetitorById(thirdPlace2.getWinner()));
+            thirdPlaceLeft = competitorService.getCompetitorById(thirdPlace1.getWinner());
+            thirdPlaceRight = competitorService.getCompetitorById(thirdPlace2.getWinner());
         } else {
-            thirdPlaceLeft = CompetitorDTO.toDto(competitorService.getCompetitorById(thirdPlace2.getWinner()));
-            thirdPlaceRight = CompetitorDTO.toDto(competitorService.getCompetitorById(thirdPlace1.getWinner()));
+            thirdPlaceLeft = competitorService.getCompetitorById(thirdPlace2.getWinner());
+            thirdPlaceRight = competitorService.getCompetitorById(thirdPlace1.getWinner());
         }
 
         return new TournamentController.TournamentPodiumDTO(firstPlace, secondPlace, thirdPlaceLeft, thirdPlaceRight);
