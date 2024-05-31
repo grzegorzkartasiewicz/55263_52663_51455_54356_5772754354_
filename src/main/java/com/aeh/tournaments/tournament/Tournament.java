@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -15,14 +16,14 @@ import java.util.Set;
 class Tournament {
 
     @Id
-    @GeneratedValue()
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private long id;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "duel_id")
+    @JoinColumn(name = "tournament_id")
     private Set<Duel> duels;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "competitor_id")
-    private Set<Competitor> competitors;
+    @JoinColumn(name = "tournament_id")
+    private Set<Competitor> competitors = new HashSet<>();
     private int numberOfCompetitors;
     @ManyToOne
     private Competitor winner;

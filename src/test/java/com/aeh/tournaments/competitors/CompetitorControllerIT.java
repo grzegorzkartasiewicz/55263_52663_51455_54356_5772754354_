@@ -14,7 +14,6 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -38,11 +37,8 @@ public class CompetitorControllerIT {
         competitorDTO.setName("Jon");
         competitorDTO.setSurname("Snow");
         competitorDTO.setAge(25);
-        competitorDTO.setGender("Male");
-        competitorDTO.setCompetition("Men's +75kg");
+        competitorDTO.setCategory("Men's +75kg");
         competitorDTO.setClub("Club XYZ");
-        competitorDTO.setAdvancement(1);
-        competitorDTO.setWeight(75);
         competitorDTO.setSkippedLast(false);
 
         given()
@@ -86,11 +82,8 @@ public class CompetitorControllerIT {
         competitorDTO.setName("John");
         competitorDTO.setSurname("Doe");
         competitorDTO.setAge(25);
-        competitorDTO.setGender("Male");
-        competitorDTO.setCompetition("Men's +80kg");
+        competitorDTO.setCategory("Men's +80kg");
         competitorDTO.setClub("Club H2O");
-        competitorDTO.setAdvancement(2);
-        competitorDTO.setWeight(80);
         competitorDTO.setSkippedLast(true);
 
         given()

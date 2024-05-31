@@ -17,12 +17,9 @@ public class CompetitorDTO {
     @Min(4)
     @Max(100)
     private int age;
-    private String gender;
-    private String competition;
+    private String category;
     @NotNull
     private String club;
-    private int advancement;
-    private int weight;
     private boolean skippedLast;
 
     public Competitor toEntity() {
@@ -31,11 +28,8 @@ public class CompetitorDTO {
         competitor.setName(name);
         competitor.setSurname(surname);
         competitor.setAge(age);
-        competitor.setGender(gender);
-        competitor.setCompetition(competition);
+        competitor.setCategory(category);
         competitor.setClub(club);
-        competitor.setAdvancement(advancement);
-        competitor.setWeight(weight);
         competitor.setSkippedLast(skippedLast);
         return competitor;
     }
@@ -49,11 +43,8 @@ public class CompetitorDTO {
         competitorDTO.setName(competitor.getName());
         competitorDTO.setSurname(competitor.getSurname());
         competitorDTO.setAge(competitor.getAge());
-        competitorDTO.setGender(competitor.getGender());
-        competitorDTO.setCompetition(competitor.getCompetition());
+        competitorDTO.setCategory(competitor.getCategory());
         competitorDTO.setClub(competitor.getClub());
-        competitorDTO.setAdvancement(competitor.getAdvancement());
-        competitorDTO.setWeight(competitor.getWeight());
         competitorDTO.setSkippedLast(competitor.isSkippedLast());
         return competitorDTO;
     }

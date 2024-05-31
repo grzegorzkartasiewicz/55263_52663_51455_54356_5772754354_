@@ -25,21 +25,25 @@ class TournamentController {
         return ResponseEntity.ok(tournamentService.createTournament(createTournamentRequest));
     }
 
+    @CrossOrigin
     @PutMapping("/{tournamentId}/competitors/{competitorId}")
     ResponseEntity<CompetitorDTO> addCompetitor(@PathVariable long tournamentId, @PathVariable long competitorId) {
         return ResponseEntity.ok(tournamentService.addCompetitor(tournamentId, competitorId));
     }
 
+    @CrossOrigin
     @PutMapping("/{tournamentId}")
     ResponseEntity<TournamentRoundResponse> newRound(@PathVariable long tournamentId, @RequestParam int round) {
         return ResponseEntity.ok(tournamentService.newRound(tournamentId, round));
     }
 
+    @CrossOrigin
     @PutMapping("/losing/{tournamentId}")
     ResponseEntity<TournamentRoundResponse> createLosingBracket(@PathVariable long tournamentId) {
         return ResponseEntity.ok(tournamentService.createLosingBranches(tournamentId));
     }
 
+    @CrossOrigin
     @GetMapping("/podium/{tournamentId}")
     ResponseEntity<TournamentPodiumDTO> getPodium(@PathVariable long tournamentId) {
         return ResponseEntity.ok(tournamentService.getPodium(tournamentId));

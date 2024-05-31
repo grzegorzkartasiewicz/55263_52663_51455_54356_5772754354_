@@ -43,7 +43,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
+			<artifactId>flyway-mysql</artifactId>
 		</dependency>
 
 		<dependency>
@@ -102,8 +102,9 @@
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-maven-plugin</artifactId>
 				<configuration>
-					<user>db</user>
-					<url>jdbc:h2:mem:db</url>
+					<user>root</user>
+					<password>root</password>
+					<url>jdbc:mysql://127.0.0.1:3307/test</url>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -40,6 +40,7 @@ import java.util.Set;
         return new ResponseEntity<>(newDuel, HttpStatus.CREATED);
     }
 
+    @CrossOrigin
     @PatchMapping("/{duelId}/winner/{competitorId}")
     ResponseEntity<DuelDTO> updateDuel(@PathVariable long duelId, @PathVariable long competitorId) {
         return ResponseEntity.ok(duelService.updateDuel(duelId, competitorId));

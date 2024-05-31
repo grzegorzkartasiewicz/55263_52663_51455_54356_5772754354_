@@ -82,9 +82,7 @@ class TournamentControllerIT {
             CompetitorDTO competitorDTO = new CompetitorDTO();
             competitorDTO.setId((long) (i+1));
             competitorDTO.setAge(18);
-            competitorDTO.setGender("Male");
-            competitorDTO.setCompetition("Kumite");
-            competitorDTO.setAdvancement(1);
+            competitorDTO.setCategory("Kumite");
             competitorDTO.setName("John");
             competitorDTO.setSurname("Smith");
             competitorDTO.setClub("Dragon " + i);
@@ -113,9 +111,7 @@ class TournamentControllerIT {
             CompetitorDTO competitorDTO = new CompetitorDTO();
             competitorDTO.setId((long) (i+1));
             competitorDTO.setAge(18);
-            competitorDTO.setGender("Male");
-            competitorDTO.setCompetition("Kumite");
-            competitorDTO.setAdvancement(1);
+            competitorDTO.setCategory("Kumite");
             competitorDTO.setName("John");
             competitorDTO.setSurname("Smith");
             competitorDTO.setClub("Dragon " + i);
@@ -144,9 +140,7 @@ class TournamentControllerIT {
             CompetitorDTO competitorDTO = new CompetitorDTO();
             competitorDTO.setId((long) (i+1));
             competitorDTO.setAge(18);
-            competitorDTO.setGender("Male");
-            competitorDTO.setCompetition("Kumite");
-            competitorDTO.setAdvancement(1);
+            competitorDTO.setCategory("Kumite");
             competitorDTO.setName("John");
             competitorDTO.setSurname("Smith");
             competitorDTO.setClub("Dragon " + i);
@@ -186,9 +180,7 @@ class TournamentControllerIT {
             CompetitorDTO competitorDTO = new CompetitorDTO();
             competitorDTO.setId((long) (i+1));
             competitorDTO.setAge(18);
-            competitorDTO.setGender("Male");
-            competitorDTO.setCompetition("Kumite");
-            competitorDTO.setAdvancement(1);
+            competitorDTO.setCategory("Kumite");
             competitorDTO.setName("John");
             competitorDTO.setSurname("Smith");
             competitorDTO.setClub("Dragon " + i);
@@ -208,12 +200,14 @@ class TournamentControllerIT {
         Tournament tournament = tournamentRepository.findById((long) tournamentId).orElseThrow();
         tournament.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
 
-        RestAssured.with().param("round", 2).when().put("/tournaments/{tournamentId}", tournamentId)
+        String prettyString = RestAssured.with().param("round", 2).when().put("/tournaments/{tournamentId}", tournamentId)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("id", equalTo(tournamentId))
                 .body("numberOfCompetitors", equalTo(6))
-                .body("duels", hasSize(4));
+                .body("duels", hasSize(4))
+                .extract().asPrettyString();
+        System.out.println(prettyString);
     }
 
     @Test
@@ -229,9 +223,7 @@ class TournamentControllerIT {
             CompetitorDTO competitorDTO = new CompetitorDTO();
             competitorDTO.setId((long) (i+1));
             competitorDTO.setAge(18);
-            competitorDTO.setGender("Male");
-            competitorDTO.setCompetition("Kumite");
-            competitorDTO.setAdvancement(1);
+            competitorDTO.setCategory("Kumite");
             competitorDTO.setName("John");
             competitorDTO.setSurname("Smith");
             competitorDTO.setClub("Dragon " + i);

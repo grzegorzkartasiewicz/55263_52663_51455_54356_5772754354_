@@ -163,6 +163,9 @@ public class TournamentService {
     }
 
     public CompetitorDTO addCompetitor(long tournamentId, long competitorId) {
+        if (tournamentRepository.findAll().isEmpty()) {
+            createTournament(new TournamentController.CreateTournamentRequest("Mistrzostwa Warszawy Karate", "15.06.2024", 10, "Karate", "test@test.com"));
+        }
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow();
         CompetitorDTO competitorDTO = competitorService.getCompetitorById(competitorId);
         tournament.getCompetitors().add(competitorDTO.toEntity());
