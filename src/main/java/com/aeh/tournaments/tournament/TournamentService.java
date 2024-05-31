@@ -20,15 +20,14 @@ public class TournamentService {
     private final DuelService duelService;
     private final CompetitorService competitorService;
 
-    TournamentReadDTO createTournament(TournamentDTO tournamentDTO) {
-        Tournament tournament = new Tournament();
+    TournamentRoundResponse createFirstRound(Tournament tournament) {
         Set<CompetitorDTO> leftCompetitors = new HashSet<>();
         Set<CompetitorDTO> rightCompetitors = new HashSet<>();
-        tournamentDTO.getCompetitors().forEach(competitorDTO -> {
-            if (leftCompetitors.size() < tournamentDTO.getCompetitors().size()/2 + tournamentDTO.getCompetitors().size()/2%2) {
-                leftCompetitors.add(competitorDTO);
+        tournament.getCompetitors().forEach(competitor -> {
+            if (leftCompetitors.size() < tournament.getCompetitors().size()/2 + tournament.getCompetitors().size()/2%2) {
+                leftCompetitors.add(CompetitorDTO.toDto(competitor));
             } else {
-                rightCompetitors.add(competitorDTO);
+                rightCompetitors.add(CompetitorDTO.toDto(competitor));
             }
         });
         Set<DuelDTO> duelsLeft = duelService.prepareRound(leftCompetitors, 1, Branch.LEFT);
@@ -37,8 +36,8 @@ public class TournamentService {
         duels.addAll(duelsLeft);
         duels.addAll(duelsRight);
         tournament.setDuels(duels.stream().map(DuelDTO::toEntity).collect(Collectors.toSet()));
-        tournament.setNumberOfCompetitors(tournamentDTO.getCompetitors().size());
-        return TournamentReadDTO.toDto(tournamentRepository.save(tournament));
+        tournament.setNumberOfCompetitors(tournament.getCompetitors().size());
+        return TournamentRoundResponse.toDtoInRound(tournamentRepository.save(tournament), 1);
     }
 
     public CompetitorDTO getWinner(long tournamentId) {
@@ -55,32 +54,36 @@ public class TournamentService {
         return tournamentRepository.findById(tournamentId).map(TournamentReadDTO::toDto);
     }
 
-    TournamentReadDTO newRound(long tournamentId, int round) {
+    TournamentRoundResponse newRound(long tournamentId, int round) {
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow();
-        Set<CompetitorDTO> leftBranchCompetitors = tournament.getDuels().stream()
-                .filter(duel -> duel.getBranch() == Branch.LEFT && duel.getRound() == (round - 1))
-                .map(duel -> competitorService.getCompetitorById(duel.getWinner()))
-                .collect(Collectors.toSet());
-        Set<CompetitorDTO> rightBranchCompetitors = tournament.getDuels().stream()
-                .filter(duel -> duel.getBranch() == Branch.RIGHT && duel.getRound() == (round - 1))
-                .map(duel -> competitorService.getCompetitorById(duel.getWinner()))
-                .collect(Collectors.toSet());
-        if (leftBranchCompetitors.size() == 1 && rightBranchCompetitors.size() == 1) {
-            List<CompetitorDTO> finalists = new ArrayList<>();
-            finalists.addAll(leftBranchCompetitors);
-            finalists.addAll(rightBranchCompetitors);
-            tournament.getDuels().addAll(duelService.prepareFinal(finalists, round).stream().map(DuelDTO::toEntity).collect(Collectors.toSet()));
-            tournament.setNumberOfCompetitors(2);
+        if (tournament.getDuels().isEmpty()) {
+            return createFirstRound(tournament);
         } else {
-            Set<DuelDTO> duelsLeft = duelService.prepareRound(leftBranchCompetitors, round, Branch.LEFT);
-            Set<DuelDTO> duelsRight = duelService.prepareRound(rightBranchCompetitors, round, Branch.RIGHT);
-            Set<DuelDTO> duels = new HashSet<>();
-            duels.addAll(duelsLeft);
-            duels.addAll(duelsRight);
-            tournament.getDuels().addAll(duels.stream().map(DuelDTO::toEntity).collect(Collectors.toSet()));
-            tournament.setNumberOfCompetitors(countCompetitors(duels));
+            Set<CompetitorDTO> leftBranchCompetitors = tournament.getDuels().stream()
+                    .filter(duel -> duel.getBranch() == Branch.LEFT && duel.getRound() == (round - 1))
+                    .map(duel -> competitorService.getCompetitorById(duel.getWinner()))
+                    .collect(Collectors.toSet());
+            Set<CompetitorDTO> rightBranchCompetitors = tournament.getDuels().stream()
+                    .filter(duel -> duel.getBranch() == Branch.RIGHT && duel.getRound() == (round - 1))
+                    .map(duel -> competitorService.getCompetitorById(duel.getWinner()))
+                    .collect(Collectors.toSet());
+            if (leftBranchCompetitors.size() == 1 && rightBranchCompetitors.size() == 1) {
+                List<CompetitorDTO> finalists = new ArrayList<>();
+                finalists.addAll(leftBranchCompetitors);
+                finalists.addAll(rightBranchCompetitors);
+                tournament.getDuels().addAll(duelService.prepareFinal(finalists, round).stream().map(DuelDTO::toEntity).collect(Collectors.toSet()));
+                tournament.setNumberOfCompetitors(2);
+            } else {
+                Set<DuelDTO> duelsLeft = duelService.prepareRound(leftBranchCompetitors, round, Branch.LEFT);
+                Set<DuelDTO> duelsRight = duelService.prepareRound(rightBranchCompetitors, round, Branch.RIGHT);
+                Set<DuelDTO> duels = new HashSet<>();
+                duels.addAll(duelsLeft);
+                duels.addAll(duelsRight);
+                tournament.getDuels().addAll(duels.stream().map(DuelDTO::toEntity).collect(Collectors.toSet()));
+                tournament.setNumberOfCompetitors(countCompetitors(duels));
+            }
         }
-        return TournamentReadDTO.toDtoInRound(tournamentRepository.save(tournament), round);
+        return TournamentRoundResponse.toDtoInRound(tournamentRepository.save(tournament), round);
     }
 
     private int countCompetitors(Set<DuelDTO> duels) {
@@ -93,10 +96,10 @@ public class TournamentService {
         }).mapToInt(Integer::intValue).sum();
     }
 
-    public TournamentReadDTO createLosingBranches(long tournamentId) {
+    public TournamentRoundResponse createLosingBranches(long tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow();
         Duel finalDuel = tournament.getDuels().stream().max(Comparator.comparingInt(Duel::getRound)).orElseThrow();
-        Set<CompetitorDTO> leftBranchCompetitors = tournament.getDuels().stream().filter(duel -> Objects.equals(duel.getParticipant1(), finalDuel.getParticipant1())
+        Set<CompetitorDTO> leftBranchCompetitors = tournament.getDuels().stream().filter(duel -> !Branch.FINAL.equals(duel.getBranch())).filter(duel -> Objects.equals(duel.getParticipant1(), finalDuel.getParticipant1())
                         || Objects.equals(duel.getParticipant2(), finalDuel.getParticipant1()))
                 .map(duel -> {
                     if (finalDuel.getParticipant1().equals(duel.getParticipant1()) && duel.getParticipant2() != null) {
@@ -106,7 +109,7 @@ public class TournamentService {
                     }
                     return null;
                 }).filter(Objects::nonNull).collect(Collectors.toSet());
-        Set<CompetitorDTO> rightBranchCompetitors = tournament.getDuels().stream().filter(duel -> Objects.equals(duel.getParticipant1(), finalDuel.getParticipant2())
+        Set<CompetitorDTO> rightBranchCompetitors = tournament.getDuels().stream().filter(duel -> !Branch.FINAL.equals(duel.getBranch())).filter(duel -> Objects.equals(duel.getParticipant1(), finalDuel.getParticipant2())
                         || Objects.equals(duel.getParticipant2(), finalDuel.getParticipant2()))
                 .map(duel -> {
                     if (finalDuel.getParticipant2().equals(duel.getParticipant1()) && duel.getParticipant2() != null) {
@@ -124,7 +127,7 @@ public class TournamentService {
         duels.addAll(duelsRight);
         tournament.getDuels().addAll(duels.stream().map(DuelDTO::toEntity).collect(Collectors.toSet()));
         tournament.setNumberOfCompetitors(countCompetitors(duels));
-        return TournamentReadDTO.toDtoInRound(tournamentRepository.save(tournament), round);
+        return TournamentRoundResponse.toDtoInRound(tournamentRepository.save(tournament), round);
     }
 
     public TournamentController.TournamentPodiumDTO getPodium(long tournamentId) {
@@ -157,5 +160,30 @@ public class TournamentService {
         }
 
         return new TournamentController.TournamentPodiumDTO(firstPlace, secondPlace, thirdPlaceLeft, thirdPlaceRight);
+    }
+
+    public CompetitorDTO addCompetitor(long tournamentId, long competitorId) {
+        if (tournamentRepository.findAll().isEmpty()) {
+            createTournament(new TournamentController.CreateTournamentRequest("Mistrzostwa Warszawy Karate", "15.06.2024", 10, "Karate", "test@test.com"));
+        }
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow();
+        CompetitorDTO competitorDTO = competitorService.getCompetitorById(competitorId);
+        tournament.getCompetitors().add(competitorDTO.toEntity());
+
+        tournamentRepository.save(tournament);
+        return competitorDTO;
+    }
+
+    public TournamentController.CreateTournamentResponse createTournament(TournamentController.CreateTournamentRequest createTournamentRequest) {
+        Tournament tournament = new Tournament();
+        tournament.setTournamentName(createTournamentRequest.name());
+        tournament.setTournamentData(createTournamentRequest.data());
+        tournament.setNumberOfCompetitors(createTournamentRequest.numberOfCompetitors());
+        tournament.setCategory(createTournamentRequest.category());
+        tournament.setEmail(createTournamentRequest.email());
+
+        tournament = tournamentRepository.save(tournament);
+        return new TournamentController.CreateTournamentResponse(tournament.getId(), tournament.getTournamentName(),
+                tournament.getTournamentData(), tournament.getNumberOfCompetitors(), tournament.getCategory(), tournament.getEmail());
     }
 }

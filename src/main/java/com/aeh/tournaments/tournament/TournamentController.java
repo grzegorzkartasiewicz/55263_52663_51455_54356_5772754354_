@@ -20,30 +20,50 @@ class TournamentController {
     ResponseEntity<TournamentReadDTO> getTournamentById(@PathVariable(name = "tournamentId") long tournamentId) {
         return ResponseEntity.ok(tournamentService.getTournamentById(tournamentId).orElseThrow());
     }
-
     @PostMapping
-    ResponseEntity<TournamentReadDTO> createTournament(@RequestBody TournamentDTO tournament) {
-        if (tournament.getCompetitors().size() < 4 || tournament.getCompetitors().size() > 32) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(tournamentService.createTournament(tournament));
+    ResponseEntity<CreateTournamentResponse> createTournament(@RequestBody CreateTournamentRequest createTournamentRequest) {
+        return ResponseEntity.ok(tournamentService.createTournament(createTournamentRequest));
     }
 
+    @CrossOrigin
+    @PutMapping("/{tournamentId}/competitors/{competitorId}")
+    ResponseEntity<CompetitorDTO> addCompetitor(@PathVariable long tournamentId, @PathVariable long competitorId) {
+        return ResponseEntity.ok(tournamentService.addCompetitor(tournamentId, competitorId));
+    }
+
+    @CrossOrigin
     @PutMapping("/{tournamentId}")
-    ResponseEntity<TournamentReadDTO> newRound(@PathVariable long tournamentId, @RequestParam int round) {
+    ResponseEntity<TournamentRoundResponse> newRound(@PathVariable long tournamentId, @RequestParam int round) {
         return ResponseEntity.ok(tournamentService.newRound(tournamentId, round));
     }
 
+    @CrossOrigin
     @PutMapping("/losing/{tournamentId}")
-    ResponseEntity<TournamentReadDTO> createLosingBracket(@PathVariable long tournamentId) {
+    ResponseEntity<TournamentRoundResponse> createLosingBracket(@PathVariable long tournamentId) {
         return ResponseEntity.ok(tournamentService.createLosingBranches(tournamentId));
     }
 
+    @CrossOrigin
     @GetMapping("/podium/{tournamentId}")
     ResponseEntity<TournamentPodiumDTO> getPodium(@PathVariable long tournamentId) {
         return ResponseEntity.ok(tournamentService.getPodium(tournamentId));
     }
 
     public record TournamentPodiumDTO (CompetitorDTO winner, CompetitorDTO secondPlace, CompetitorDTO thirdPlaceLeft, CompetitorDTO thirdPlaceRight) {
+    }
+
+    public record CreateTournamentRequest(String name,
+                                          String data,
+                                          int numberOfCompetitors,
+                                          String category,
+                                          String email) {
+    }
+
+    public record CreateTournamentResponse(long tournamentId,
+                                           String name,
+                                           String data,
+                                           int numberOfCompetitors,
+                                           String category,
+                                           String email) {
     }
 }

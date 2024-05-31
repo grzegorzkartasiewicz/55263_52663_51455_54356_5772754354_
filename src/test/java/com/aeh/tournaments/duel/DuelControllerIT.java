@@ -118,7 +118,7 @@ public class DuelControllerIT {
         duelDTO.setParticipant2(2L);
         duelDTO.setWinner(1L);
         DuelService duelService = mock(DuelService.class);
-        when(duelService.updateDuel(1L, duelDTO)).thenReturn(duelDTO);
+        when(duelService.updateDuel(1L, 1L)).thenReturn(duelDTO);
 
         given()
                 .contentType(ContentType.JSON)

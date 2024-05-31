@@ -98,6 +98,15 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<configuration>
+					<user>root</user>
+					<password>root</password>
+					<url>jdbc:mysql://127.0.0.1:3307/test</url>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

@@ -71,23 +71,27 @@ class TournamentControllerIT {
 
     @Test
     void createTournamentWithEvenCompetitorsShouldReturnTournamentWithFirstRoundTest() {
+        TournamentController.CreateTournamentRequest createTournamentRequest =
+                new TournamentController.CreateTournamentRequest("name", "05.05.2024", 10, "Kumite", "test@test.com");
+        int tournamentId = RestAssured.with().body(createTournamentRequest).contentType(ContentType.JSON).when().post("/tournaments")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().body().jsonPath().getInt("tournamentId");
         Set<CompetitorDTO> competitorDTOS = new HashSet<>();
         for (int i=0; i<10; i++) {
             CompetitorDTO competitorDTO = new CompetitorDTO();
-            competitorDTO.setId(i+1);
+            competitorDTO.setId((long) (i+1));
             competitorDTO.setAge(18);
-            competitorDTO.setGender("Male");
-            competitorDTO.setCompetition("Kumite");
-            competitorDTO.setAdvancement(1);
+            competitorDTO.setCategory("Kumite");
             competitorDTO.setName("John");
             competitorDTO.setSurname("Smith");
             competitorDTO.setClub("Dragon " + i);
             competitorService.save(competitorDTO);
-            competitorDTOS.add(competitorDTO);
+            RestAssured.put("/tournaments/{tournamentId}/competitors/{competitorId}", tournamentId, competitorDTO.getId())
+                    .then()
+                    .statusCode(HttpStatus.SC_OK);
         }
-        TournamentDTO tournamentDTO = new TournamentDTO(competitorDTOS);
-
-        RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
+        RestAssured.with().param("round", 1).when().put("/tournaments/{tournamentId}", tournamentId)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("numberOfCompetitors", equalTo(10))
@@ -96,23 +100,28 @@ class TournamentControllerIT {
 
     @Test
     void createTournamentWithNotEvenCompetitorsShouldReturnTournamentWithFirstRoundTest() {
+        TournamentController.CreateTournamentRequest createTournamentRequest =
+                new TournamentController.CreateTournamentRequest("name", "05.05.2024", 11, "Kumite", "test@test.com");
+        int tournamentId = RestAssured.with().body(createTournamentRequest).contentType(ContentType.JSON).when().post("/tournaments")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().body().jsonPath().getInt("tournamentId");
         Set<CompetitorDTO> competitorDTOS = new HashSet<>();
         for (int i=0; i<11; i++) {
             CompetitorDTO competitorDTO = new CompetitorDTO();
-            competitorDTO.setId(i+1);
+            competitorDTO.setId((long) (i+1));
             competitorDTO.setAge(18);
-            competitorDTO.setGender("Male");
-            competitorDTO.setCompetition("Kumite");
-            competitorDTO.setAdvancement(1);
+            competitorDTO.setCategory("Kumite");
             competitorDTO.setName("John");
             competitorDTO.setSurname("Smith");
             competitorDTO.setClub("Dragon " + i);
             competitorService.save(competitorDTO);
-            competitorDTOS.add(competitorDTO);
+            RestAssured.put("/tournaments/{tournamentId}/competitors/{competitorId}", tournamentId, competitorDTO.getId())
+                    .then()
+                    .statusCode(HttpStatus.SC_OK);
         }
-        TournamentDTO tournamentDTO = new TournamentDTO(competitorDTOS);
 
-        RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
+        RestAssured.with().param("round", 1).when().put("/tournaments/{tournamentId}", tournamentId)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("numberOfCompetitors", equalTo(11))
@@ -120,34 +129,28 @@ class TournamentControllerIT {
     }
 
     @Test
-    void createTournamentWithoutCompetitorsShouldReturnTournamentWithFirstRoundTest() {
-        Set<CompetitorDTO> competitorDTOS = new HashSet<>();
-        TournamentDTO tournamentDTO = new TournamentDTO(competitorDTOS);
-
-        RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
-                .then()
-                .statusCode(HttpStatus.SC_BAD_REQUEST);
-    }
-
-    @Test
     void newRoundWithEvenCompetitorsShouldReturnTournamentWithNewRoundTest() {
-        Set<CompetitorDTO> competitorDTOS = new HashSet<>();
+        TournamentController.CreateTournamentRequest createTournamentRequest =
+                new TournamentController.CreateTournamentRequest("name", "05.05.2024", 10, "Kumite", "test@test.com");
+        int tournamentId = RestAssured.with().body(createTournamentRequest).contentType(ContentType.JSON).when().post("/tournaments")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().body().jsonPath().getInt("tournamentId");
         for (int i=0; i<10; i++) {
             CompetitorDTO competitorDTO = new CompetitorDTO();
-            competitorDTO.setId(i+1);
+            competitorDTO.setId((long) (i+1));
             competitorDTO.setAge(18);
-            competitorDTO.setGender("Male");
-            competitorDTO.setCompetition("Kumite");
-            competitorDTO.setAdvancement(1);
+            competitorDTO.setCategory("Kumite");
             competitorDTO.setName("John");
             competitorDTO.setSurname("Smith");
             competitorDTO.setClub("Dragon " + i);
             competitorService.save(competitorDTO);
-            competitorDTOS.add(competitorDTO);
+            RestAssured.put("/tournaments/{tournamentId}/competitors/{competitorId}", tournamentId, competitorDTO.getId())
+                    .then()
+                    .statusCode(HttpStatus.SC_OK);
         }
-        TournamentDTO tournamentDTO = new TournamentDTO(competitorDTOS);
 
-        int tournamentId = RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
+        RestAssured.with().param("round", 1).when().put("/tournaments/{tournamentId}", tournamentId)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("numberOfCompetitors", equalTo(10))
@@ -162,28 +165,32 @@ class TournamentControllerIT {
                 .statusCode(HttpStatus.SC_OK)
                 .body("id", equalTo(tournamentId))
                 .body("numberOfCompetitors", equalTo(5))
-                .body("duels", hasSize(8));
+                .body("duels", hasSize(3));
     }
 
     @Test
     void newRoundWithNotEvenCompetitorsShouldReturnTournamentWithNewRoundTest() {
-        Set<CompetitorDTO> competitorDTOS = new HashSet<>();
+        TournamentController.CreateTournamentRequest createTournamentRequest =
+                new TournamentController.CreateTournamentRequest("name", "05.05.2024", 11, "Kumite", "test@test.com");
+        int tournamentId = RestAssured.with().body(createTournamentRequest).contentType(ContentType.JSON).when().post("/tournaments")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().body().jsonPath().getInt("tournamentId");
         for (int i=0; i<11; i++) {
             CompetitorDTO competitorDTO = new CompetitorDTO();
-            competitorDTO.setId(i+1);
+            competitorDTO.setId((long) (i+1));
             competitorDTO.setAge(18);
-            competitorDTO.setGender("Male");
-            competitorDTO.setCompetition("Kumite");
-            competitorDTO.setAdvancement(1);
+            competitorDTO.setCategory("Kumite");
             competitorDTO.setName("John");
             competitorDTO.setSurname("Smith");
             competitorDTO.setClub("Dragon " + i);
             competitorService.save(competitorDTO);
-            competitorDTOS.add(competitorDTO);
+            RestAssured.put("/tournaments/{tournamentId}/competitors/{competitorId}", tournamentId, competitorDTO.getId())
+                    .then()
+                    .statusCode(HttpStatus.SC_OK);
         }
-        TournamentDTO tournamentDTO = new TournamentDTO(competitorDTOS);
 
-        int tournamentId = RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
+        RestAssured.with().param("round", 1).when().put("/tournaments/{tournamentId}", tournamentId)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("numberOfCompetitors", equalTo(11))
@@ -193,43 +200,51 @@ class TournamentControllerIT {
         Tournament tournament = tournamentRepository.findById((long) tournamentId).orElseThrow();
         tournament.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
 
-        RestAssured.with().param("round", 2).when().put("/tournaments/{tournamentId}", tournamentId)
+        String prettyString = RestAssured.with().param("round", 2).when().put("/tournaments/{tournamentId}", tournamentId)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("id", equalTo(tournamentId))
                 .body("numberOfCompetitors", equalTo(6))
-                .body("duels", hasSize(10));
+                .body("duels", hasSize(4))
+                .extract().asPrettyString();
+        System.out.println(prettyString);
     }
 
     @Test
     void e2eTournamentTest() {
-        Set<CompetitorDTO> competitorDTOS = new HashSet<>();
+        TournamentController.CreateTournamentRequest createTournamentRequest =
+                new TournamentController.CreateTournamentRequest("name", "05.05.2024", 10, "Kumite", "test@test.com");
+        int tournamentId = RestAssured.with().body(createTournamentRequest).contentType(ContentType.JSON).when().post("/tournaments")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().body().jsonPath().getInt("tournamentId");
+
         for (int i=0; i<10; i++) {
             CompetitorDTO competitorDTO = new CompetitorDTO();
-            competitorDTO.setId(i+1);
+            competitorDTO.setId((long) (i+1));
             competitorDTO.setAge(18);
-            competitorDTO.setGender("Male");
-            competitorDTO.setCompetition("Kumite");
-            competitorDTO.setAdvancement(1);
+            competitorDTO.setCategory("Kumite");
             competitorDTO.setName("John");
             competitorDTO.setSurname("Smith");
             competitorDTO.setClub("Dragon " + i);
             competitorService.save(competitorDTO);
-            competitorDTOS.add(competitorDTO);
-        }
-        TournamentDTO tournamentDTO = new TournamentDTO(competitorDTOS);
 
-        int tournamentId = RestAssured.with().body(tournamentDTO).contentType(ContentType.JSON).when().post("/tournaments")
+            RestAssured.put("/tournaments/{tournamentId}/competitors/{competitorId}", tournamentId, competitorDTO.getId())
+                    .then()
+                    .statusCode(HttpStatus.SC_OK);
+        }
+
+        TournamentReadDTO tournamentReadDTO = RestAssured.with().param("round", 1).when().put("/tournaments/{tournamentId}", tournamentId)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
+                .body("id", equalTo(tournamentId))
                 .body("numberOfCompetitors", equalTo(10))
                 .body("duels", hasSize(5))
-                .extract().body().jsonPath().getInt("id");
+                .extract().body().as(TournamentReadDTO.class);
 
-        Tournament tournament = tournamentRepository.findById((long) tournamentId).orElseThrow();
-        tournament.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
+        tournamentReadDTO.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
 
-        TournamentReadDTO tournamentReadDTO = RestAssured.with().param("round", 2).when().put("/tournaments/{tournamentId}", tournamentId)
+        tournamentReadDTO = RestAssured.with().param("round", 2).when().put("/tournaments/{tournamentId}", tournamentId)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("id", equalTo(tournamentId))
@@ -268,8 +283,8 @@ class TournamentControllerIT {
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("id", equalTo(tournamentId))
-                .body("numberOfCompetitors", equalTo(7))
-                .body("duels", hasSize(4))
+                .body("numberOfCompetitors", equalTo(5))
+                .body("duels", hasSize(3))
                 .extract().body().as(TournamentReadDTO.class);
 
         tournamentReadDTO.getDuels().forEach(duel -> duelService.updateWinner(duel.getId(), duel.getParticipant1()));
@@ -278,7 +293,7 @@ class TournamentControllerIT {
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .body("id", equalTo(tournamentId))
-                .body("numberOfCompetitors", equalTo(4))
+                .body("numberOfCompetitors", equalTo(3))
                 .body("duels", hasSize(2)) // result of these duels are going to be two third places
                 .extract().body().as(TournamentReadDTO.class);
 
